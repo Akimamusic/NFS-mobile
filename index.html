@@ -3,128 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Торговая Площадка</title>
+    <title>РусьАвито — Русь Mobile RP</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0f0f13;
-            --card-bg: #1a1a24;
-            --modal-bg: #161622;
-            --accent-color: #6c5ce7;
-            --accent-hover: #5b4bc4;
-            --text-main: #ffffff;
-            --text-secondary: #a0a0b2;
-            --border-color: #2a2a3a;
-            --danger-color: #ff4757;
-            --success-color: #2ed573;
-            --urgent-color: #ff7675;
+            --bg-gradient: linear-gradient(135deg, #0f0c20 0%, #15102a 50%, #090a15 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-card: rgba(26, 22, 48, 0.65);
+            --neon-blue: #00f2fe;
+            --neon-purple: #9b51e0;
+            --neon-green: #00ff88;
+            --neon-red: #ff2a5f;
+            --vk-blue: #0077ff;
+            --tg-blue: #229ed9;
+            --ds-purple: #5865f2;
+            --text-primary: #ffffff;
+            --text-secondary: #8f92b2;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-primary);
             padding-bottom: 90px;
+            min-height: 100vh;
         }
 
-        header {
+        /* Шапка */
+        .header {
             position: sticky;
             top: 0;
-            z-index: 10;
-            background: rgba(15, 15, 19, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 12, 32, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 100;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
-        .header-title {
-            font-size: 18px;
+        .brand-title {
+            font-size: 20px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00f2fe, #4facfe, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .server-badge {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: var(--neon-blue);
+            font-size: 11px;
             font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
         }
 
-        .btn-filter-icon {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .search-box {
+        /* Поиск и фильтры */
+        .search-bar {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .search-input {
-            width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px 14px;
-            color: var(--text-main);
+            flex-grow: 1;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 12px 16px;
+            color: #fff;
             font-size: 14px;
             outline: none;
         }
 
-        .container {
-            padding: 16px;
+        .filter-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .filter-btn.active-filter::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--neon-green);
         }
 
         .section-header {
+            padding: 16px 18px 4px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
+            justify-content: space-between;
         }
 
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .btn-clear {
-            background: none;
-            border: none;
-            color: var(--urgent-color);
-            font-size: 12px;
+        .clear-author-btn {
+            background: rgba(255, 42, 95, 0.15);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 10px;
             cursor: pointer;
-            display: none;
+            font-weight: 700;
         }
 
-        .feed-grid {
+        /* Лента товаров */
+        .market-feed {
+            padding: 10px 18px 0;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 14px;
         }
 
         .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            background: var(--glass-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
             overflow: hidden;
+            position: relative;
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
+            transition: transform 0.2s;
         }
 
+        .card:active { transform: scale(0.98); }
+
         .card-preview {
-            height: 120px;
+            width: 100%;
+            height: 125px;
             background-size: cover;
             background-position: center;
             position: relative;
@@ -134,16 +175,19 @@
             position: absolute;
             top: 8px;
             left: 8px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            padding: 2px 6px;
-            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            color: #fff;
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 8px;
         }
 
         .card-tag.urgent {
-            background: var(--danger-color);
+            background: rgba(255, 42, 95, 0.85);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 42, 95, 0.5);
         }
 
         .like-btn {
@@ -151,109 +195,177 @@
             top: 8px;
             right: 8px;
             background: rgba(0, 0, 0, 0.5);
-            border: none;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 14px;
             cursor: pointer;
-            font-size: 12px;
+            z-index: 5;
         }
 
-        .card-content {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
+        .like-btn.active {
+            background: rgba(255, 42, 95, 0.25);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 10px rgba(255, 42, 95, 0.4);
         }
+
+        .card-content { padding: 12px; }
 
         .card-name {
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .card-price {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent-color);
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+            margin-bottom: 6px;
         }
 
         .card-footer {
             display: flex;
             justify-content: space-between;
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-secondary);
-            margin-top: auto;
-            padding-top: 6px;
         }
 
-        .dock {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(22, 22, 34, 0.95);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid var(--border-color);
+        /* Заглушка пустого списка */
+        .empty-state {
+            grid-column: span 2;
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--glass-card);
+            border: 1px dashed var(--glass-border);
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+
+        .empty-icon { font-size: 44px; margin-bottom: 10px; }
+        .empty-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: #fff; }
+        .empty-text { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+        /* Раздел ПРОФИЛЬ */
+        .profile-wrapper {
+            padding: 10px 18px 20px;
+            display: none;
+        }
+
+        .profile-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .profile-card-title {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            color: #fff;
             display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 100;
+            align-items: center;
+            gap: 8px;
         }
 
-        .dock-tab {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
+        .social-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .social-toggle-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Мои лоты в профиле */
+        .my-lots-list {
             display: flex;
             flex-direction: column;
+            gap: 12px;
+        }
+
+        .my-lot-item {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
             align-items: center;
-            gap: 4px;
+        }
+
+        .my-lot-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+        }
+
+        .my-lot-info { flex-grow: 1; overflow: hidden; }
+        .my-lot-title { font-size: 14px; font-weight: 800; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .my-lot-price { font-size: 14px; font-weight: 900; color: var(--neon-green); }
+
+        .my-lot-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn-lot-action {
+            border: none;
+            padding: 6px 12px;
+            border-radius: 10px;
             font-size: 11px;
+            font-weight: 700;
             cursor: pointer;
-            width: 20%;
+            transition: transform 0.2s;
         }
 
-        .dock-tab.active {
-            color: var(--accent-color);
-        }
+        .btn-lot-edit { background: rgba(0, 242, 254, 0.15); border: 1px solid var(--neon-blue); color: var(--neon-blue); }
+        .btn-lot-delete { background: rgba(255, 42, 95, 0.15); border: 1px solid var(--neon-red); color: var(--neon-red); }
 
-        .dock-tab .icon {
-            font-size: 18px;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
+        /* Модальные окна */
+        .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: none;
             align-items: flex-end;
-            justify-content: center;
         }
 
-        .modal.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal-content {
-            background: var(--modal-bg);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+            background: #141126;
+            border-top: 1px solid var(--glass-border);
+            border-radius: 28px 28px 0 0;
             width: 100%;
-            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            animation: slideUp 0.25s ease-out;
+            padding: 24px 20px 30px;
+            animation: slideUp 0.3s ease-out forwards;
         }
 
         @keyframes slideUp {
@@ -265,468 +377,647 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
-        .modal-close {
-            background: none;
+        .modal-title { font-size: 18px; font-weight: 800; }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
             border: none;
             color: var(--text-secondary);
-            font-size: 20px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 18px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .form-group {
-            margin-bottom: 14px;
+        .filter-group { margin-bottom: 16px; }
+        .filter-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        .select-input, .number-input, .text-input, .textarea-input { 
+            width: 100%; 
+            background: var(--glass-bg); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 12px; 
+            padding: 12px 14px; 
+            color: #fff; 
+            font-size: 14px; 
+            outline: none; 
         }
+        .textarea-input { resize: none; height: 90px; }
+        .select-input option { background: #141126; color: #fff; }
+        .price-inputs { display: flex; gap: 10px; }
+        .price-inputs input { width: 50%; }
 
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-
-        .form-control {
-            width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
+        .photo-upload-box {
+            border: 2px dashed var(--glass-border);
+            background: var(--glass-bg);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
             cursor: pointer;
-            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-primary:active {
-            background: var(--accent-hover);
-        }
-
-        /* Profile & Lots */
-        .profile-section {
+        .photo-preview {
+            width: 100%;
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
             display: none;
         }
 
-        .my-lot-item {
+        .file-input-hidden { display: none; }
+
+        .urgent-toggle-wrapper {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            justify-content: space-between;
+            background: rgba(255, 42, 95, 0.08);
+            border: 1px solid rgba(255, 42, 95, 0.25);
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 18px;
         }
 
-        .my-lot-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
+        .urgent-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 26px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--neon-red);
+            box-shadow: 0 0 10px rgba(255, 42, 95, 0.5);
+        }
+
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-reset { width: 35%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-secondary); border-radius: 14px; font-weight: 600; cursor: pointer; padding: 14px; }
+        .btn-apply { width: 65%; background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple)); border: none; color: #fff; padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; }
+        .btn-submit-full { width: 100%; background: linear-gradient(135deg, var(--neon-green), #00b09b); border: none; color: #000; padding: 16px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
+
+        /* Просмотр товара */
+        .product-modal-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 20px;
             background-size: cover;
             background-position: center;
+            margin-bottom: 16px;
         }
 
-        .my-lot-info {
-            flex: 1;
-        }
+        .product-details-price { font-size: 24px; font-weight: 900; color: var(--neon-green); margin-bottom: 6px; }
+        .product-details-title { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
 
-        .my-lot-title {
+        .product-tags { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .tag-item { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 10px; font-size: 12px; color: var(--text-secondary); }
+
+        .product-desc {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 14px;
             font-size: 13px;
-            font-weight: 600;
+            line-height: 1.5;
+            color: #d1d5db;
+            margin-bottom: 20px;
         }
 
-        .my-lot-price {
+        .seller-info-box {
+            background: rgba(0, 242, 254, 0.06);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            padding: 12px 16px;
+            border-radius: 14px;
             font-size: 13px;
-            color: var(--accent-color);
-            font-weight: 700;
-        }
-
-        .my-lot-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .btn-lot-action {
-            background: var(--border-color);
-            color: var(--text-main);
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        .btn-lot-delete {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .chat-list-item {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
+            color: #fff;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            cursor: pointer;
+            justify-content: space-between;
         }
 
-        .msg-bubble {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            line-height: 1.4;
-        }
+        .seller-info-title { color: var(--text-secondary); font-size: 11px; text-transform: uppercase; font-weight: 700; }
+        .seller-site-nick { font-size: 15px; font-weight: 900; color: var(--neon-blue); }
 
-        .msg-bubble.me {
-            background: var(--accent-color);
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 2px;
-        }
-
-        .msg-bubble.other {
-            background: var(--card-bg);
-            color: var(--text-main);
-            margin-right: auto;
-            border-bottom-left-radius: 2px;
-        }
-
-        .contact-links {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 14px;
-        }
+        .contacts-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 10px; }
+        .contacts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
 
         .contact-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: white;
+            padding: 12px;
+            border-radius: 14px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
         }
 
-        .btn-tg { background: #0088cc; }
-        .btn-vk { background: #4c75a3; }
-        .btn-ds { background: #5865f2; }
+        .btn-chat-author { grid-column: span 2; background: linear-gradient(135deg, var(--neon-blue), #00b09b); color: #000; font-weight: 800; font-size: 14px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+        .btn-ingame { background: rgba(0, 255, 136, 0.15); border: 1px solid var(--neon-green); color: var(--neon-green); grid-column: span 2; }
+        .btn-tg { background: var(--tg-blue); }
+        .btn-vk { background: var(--vk-blue); }
+        .btn-ds { background: var(--ds-purple); grid-column: span 2; }
+
+        .btn-author-goods {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(155, 81, 224, 0.15));
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* ЧАТЫ */
+        .chat-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .chat-avatar-box {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+            display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+        }
+
+        .chat-main-info { flex-grow: 1; overflow: hidden; }
+        .chat-nick { font-size: 14px; font-weight: 800; color: #fff; display: flex; justify-content: space-between; }
+        .chat-product-sub { font-size: 11px; color: var(--neon-blue); font-weight: 600; margin: 2px 0 4px; }
+        .chat-last-text { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .chat-dialog-messages {
+            display: flex; flex-direction: column; gap: 10px; max-height: 55vh; min-height: 250px; overflow-y: auto; padding: 10px 0;
+        }
+
+        .msg-bubble { max-width: 82%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; word-break: break-word; }
+        .msg-bubble.them { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); align-self: flex-start; border-bottom-left-radius: 4px; color: #fff; }
+        .msg-bubble.me { background: linear-gradient(135deg, var(--neon-blue), #00b09b); color: #000; font-weight: 700; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .chat-input-bar { display: flex; gap: 8px; margin-top: 14px; }
+
+        /* Нижняя навигация */
+        .bottom-dock {
+            position: fixed;
+            bottom: 15px; left: 18px; right: 18px;
+            background: rgba(20, 16, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 6px;
+            z-index: 1000;
+        }
+
+        .dock-tab {
+            display: flex; flex-direction: column; align-items: center; color: var(--text-secondary);
+            font-size: 10px; font-weight: 600; text-decoration: none; gap: 4px; width: 20%;
+        }
+
+        .dock-tab.active { color: var(--neon-blue); }
+        .dock-tab .icon { font-size: 20px; }
+        .dock-tab.create-btn { background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple)); color: #fff; padding: 8px 0; border-radius: 16px; }
     </style>
 </head>
 <body>
 
-    <header id="mainHeader">
+    <!-- Шапка -->
+    <div class="header">
         <div class="header-top">
-            <div class="header-title">🛒 Marketplace</div>
-            <button class="btn-filter-icon" onclick="toggleModal('filterModal', true)">⚙️ Фильтры</button>
+            <div class="brand-title">РусьАвито</div>
+            <div class="server-badge">РУСЬ MOBILE RP</div>
         </div>
-        <div class="search-box" id="searchBarBox">
-            <input type="text" class="search-input" placeholder="Поиск авто, недвижимости..." oninput="handleSearchInput(this.value)">
-        </div>
-    </header>
-
-    <div class="container">
-        <div class="section-header">
-            <div class="section-title" id="sectionTitle">🔥 Все объявления</div>
-            <button class="btn-clear" id="clearAuthorBtn" onclick="clearAuthorFilter()">Сбросить автора</button>
-        </div>
-
-        <div class="feed-grid" id="feedContainer"></div>
-
-        <div class="profile-section" id="profileSection">
-            <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
-                <h3 style="margin-bottom: 12px; font-size: 15px;">👤 Настройки профиля</h3>
-                <div class="form-group">
-                    <label>Ник на сайте / в приложении</label>
-                    <input type="text" id="profSiteNick" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Игровой Nick_Name</label>
-                    <input type="text" id="profGameNick" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Игровой номер телефона</label>
-                    <input type="text" id="profGamePhone" class="form-control">
-                </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <input type="checkbox" id="toggleTg" onchange="toggleSocialField('Tg')">
-                    <label for="toggleTg" style="margin: 0;">Указывать Telegram</label>
-                </div>
-                <div class="form-group" id="boxTgInput">
-                    <input type="text" id="profTgLink" class="form-control" placeholder="https://t.me/username">
-                </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <input type="checkbox" id="toggleVk" onchange="toggleSocialField('Vk')">
-                    <label for="toggleVk" style="margin: 0;">Указывать VK</label>
-                </div>
-                <div class="form-group" id="boxVkInput">
-                    <input type="text" id="profVkLink" class="form-control" placeholder="https://vk.com/id">
-                </div>
-                <div class="form-group">
-                    <label>Discord Tag</label>
-                    <input type="text" id="profDiscord" class="form-control" placeholder="username#0000">
-                </div>
-                <button class="btn-primary" onclick="saveProfileSettings()">Сохранить профиль</button>
-            </div>
-
-            <div class="section-header">
-                <div class="section-title">📦 Мои опубликованные лоты</div>
-                <span id="myLotsCount" style="font-size: 12px; color: var(--text-secondary);">0 шт</span>
-            </div>
-            <div id="myLotsContainer"></div>
+        <div class="search-bar" id="searchBarBox">
+            <input type="text" id="searchInput" class="search-input" placeholder="Поиск товара..." oninput="handleSearchInput(this.value)">
+            <button class="filter-btn" id="filterBtn" onclick="toggleModal('filterModal', true)">🎛️</button>
         </div>
     </div>
 
-    <!-- Navigation Dock -->
-    <div class="dock">
-        <button class="dock-tab active" onclick="switchTab(this, 'feed')">
-            <span class="icon">🏠</span>
-            <span>Главная</span>
-        </button>
-        <button class="dock-tab" onclick="switchTab(this, 'wishlist')">
-            <span class="icon">❤️</span>
-            <span>Избранное</span>
-        </button>
-        <button class="dock-tab" onclick="switchTab(this, 'create')">
-            <span class="icon">➕</span>
-            <span>Продать</span>
-        </button>
-        <button class="dock-tab" onclick="switchTab(this, 'chats')">
-            <span class="icon">💬</span>
-            <span>Чаты</span>
-        </button>
-        <button class="dock-tab" onclick="switchTab(this, 'profile')">
-            <span class="icon">👤</span>
-            <span>Профиль</span>
-        </button>
+    <!-- Заголовок раздела -->
+    <div class="section-header">
+        <span id="sectionTitle">🔥 Все объявления</span>
+        <button id="clearAuthorBtn" class="clear-author-btn" style="display: none;" onclick="clearAuthorFilter()">✖ Сбросить автора</button>
     </div>
 
-    <!-- Create Product Modal -->
-    <div class="modal" id="createModal">
+    <!-- Лента товаров и Чаты -->
+    <div class="market-feed" id="feedContainer"></div>
+
+    <!-- РАЗДЕЛ ПРОФИЛЬ -->
+    <div class="profile-wrapper" id="profileSection">
+        <!-- Настройки профиля -->
+        <div class="profile-card">
+            <div class="profile-card-title">⚙️ Настройки профиля</div>
+            
+            <div class="filter-group">
+                <div class="filter-label">Ник на сайте *</div>
+                <input type="text" id="profSiteNick" class="text-input" placeholder="Введите ваш ник на сайте">
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-label">Ник в игре (RolePlay) *</div>
+                <input type="text" id="profGameNick" class="text-input" placeholder="например: Egor_Cred">
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-label">Номер телефона в игре *</div>
+                <input type="text" id="profGamePhone" class="text-input" placeholder="например: 777-888">
+            </div>
+
+            <!-- Тумблер и поле Telegram -->
+            <div class="filter-group">
+                <div class="social-toggle-row">
+                    <span class="social-toggle-label">✈️ Telegram</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleTg" onchange="toggleSocialField('Tg')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div id="boxTgInput" style="display: none; margin-top: 8px;">
+                    <input type="text" id="profTgLink" class="text-input" placeholder="Ссылка на ТГ (например: https://t.me/nick)">
+                </div>
+            </div>
+
+            <!-- Тумблер и поле ВКонтакте -->
+            <div class="filter-group">
+                <div class="social-toggle-row">
+                    <span class="social-toggle-label">🟦 ВКонтакте</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleVk" onchange="toggleSocialField('Vk')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div id="boxVkInput" style="display: none; margin-top: 8px;">
+                    <input type="text" id="profVkLink" class="text-input" placeholder="Ссылка на ВК (например: https://vk.com/id123)">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-label">Discord (необязательно)</div>
+                <input type="text" id="profDiscord" class="text-input" placeholder="ваш_дискорд#1234">
+            </div>
+
+            <button class="btn-submit-full" style="font-size: 13px; padding: 12px;" onclick="saveProfileSettings()">
+                💾 Сохранить настройки
+            </button>
+        </div>
+
+        <!-- Раздел Мои лоты -->
+        <div class="profile-card">
+            <div class="profile-card-title" style="justify-content: space-between;">
+                <span>📦 Мои лоты (Объявления)</span>
+                <span id="myLotsCount" style="font-size: 12px; color: var(--neon-blue); font-weight: 700;">0 шт</span>
+            </div>
+            <div class="my-lots-list" id="myLotsContainer"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: Создание объявления -->
+    <div class="modal-overlay" id="createModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Разместить объявление</h3>
-                <button class="modal-close" onclick="toggleModal('createModal', false)">✕</button>
+                <div class="modal-title">📢 Подать объявление</div>
+                <button class="close-btn" onclick="toggleModal('createModal', false)">✕</button>
             </div>
-            <div class="form-group">
-                <label>Название товара/имущества</label>
-                <input type="text" id="createTitle" class="form-control" placeholder="например: BMW M5 F90">
+
+            <div class="filter-group">
+                <div class="filter-label">Название товара *</div>
+                <input type="text" id="createTitle" class="text-input" placeholder="BMW M5 F90">
             </div>
-            <div class="form-group">
-                <label>Категория</label>
-                <select id="createCategory" class="form-control">
-                    <option value="auto">🏎️ Авторынок</option>
-                    <option value="realty">🏰 Недвижимость</option>
+
+            <div class="filter-group">
+                <div class="filter-label">Вид товара *</div>
+                <select class="select-input" id="createCategory">
+                    <option value="" disabled selected>Выберите категорию...</option>
+                    <option value="auto">🏎️ Авторынок (Транспорт)</option>
+                    <option value="realty">🏰 Недвижимость (Дома/Квартиры)</option>
                     <option value="business">💎 Бизнес</option>
-                    <option value="skins">👕 Скины/Аксессуары</option>
-                    <option value="numbers">📞 Номера/Сим</option>
+                    <option value="skins">👕 Скины и Аксессуары</option>
+                    <option value="numbers">📞 Сим-карты и Номера</option>
                     <option value="other">📦 Прочее</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Номер сервера</label>
-                <input type="number" id="createServer" class="form-control" placeholder="1">
+
+            <div class="filter-group">
+                <div class="filter-label">Сервер *</div>
+                <select class="select-input" id="createServer">
+                    <option value="" disabled selected>Выберите ваш сервер...</option>
+                    <option value="1">Сервер #1</option>
+                    <option value="2">Сервер #2</option>
+                    <option value="3">Сервер #3</option>
+                    <option value="4">Сервер #4</option>
+                    <option value="5">Сервер #5</option>
+                    <option value="6">Сервер #6</option>
+                    <option value="7">Сервер #7</option>
+                </select>
             </div>
-            <div class="form-group">
-                <label>Цена (₽)</label>
-                <input type="number" id="createPrice" class="form-control" placeholder="1000000">
+
+            <div class="filter-group">
+                <div class="filter-label">Цена (₽) *</div>
+                <input type="number" id="createPrice" class="number-input" placeholder="Стоимость в рублях">
             </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="createUrgent">
-                <label for="createUrgent" style="margin: 0;">Срочная продажа (метка 🔥)</label>
-            </div>
-            <div class="form-group">
-                <label>Фотография (загрузка)</label>
-                <div id="uploadPreview" style="height: 100px; background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; background-size: cover; background-position: center;" onclick="triggerFileInput('createImageInput')">
-                    <span id="uploadHint" style="font-size: 12px; color: var(--text-secondary);">📷 Нажмите, чтобы выбрать фото</span>
+
+            <div class="filter-group">
+                <div class="filter-label">Прикрепить фото *</div>
+                <div class="photo-upload-box" onclick="triggerFileInput('photoFileInput')">
+                    <div id="uploadPlaceholder">
+                        <div style="font-size: 28px; margin-bottom: 4px;">📷</div>
+                        <div style="font-size: 12px; font-weight: 700; color: #fff;">Загрузить фото</div>
+                    </div>
+                    <div class="photo-preview" id="photoPreview"></div>
                 </div>
-                <input type="file" id="createImageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event, 'uploadPreview', 'uploadHint')">
+                <input type="file" id="photoFileInput" class="file-input-hidden" accept="image/*" onchange="handleImageSelect(event, 'photoPreview', 'uploadPlaceholder')">
             </div>
-            <div class="form-group">
-                <label>Описание</label>
-                <textarea id="createDesc" class="form-control" placeholder="Укажите комплектацию, торг, характеристики..."></textarea>
+
+            <div class="urgent-toggle-wrapper">
+                <div class="urgent-title">
+                    <span>🔥</span>
+                    <span>Отметить как «СРОЧНО»</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="createUrgent">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <button class="btn-primary" onclick="submitNewProduct()">Опубликовать</button>
+
+            <div class="filter-group">
+                <div class="filter-label">Описание товара *</div>
+                <textarea id="createDesc" class="textarea-input" placeholder="Опишите детали товара..."></textarea>
+            </div>
+
+            <button class="btn-submit-full" onclick="submitNewProduct()">Опубликовать объявление</button>
         </div>
     </div>
 
-    <!-- Edit Product Modal -->
-    <div class="modal" id="editModal">
+    <!-- МОДАЛЬНОЕ ОКНО: Редактирование объявления -->
+    <div class="modal-overlay" id="editModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Редактировать объявление</h3>
-                <button class="modal-close" onclick="toggleModal('editModal', false)">✕</button>
+                <div class="modal-title">✏️ Редактировать лот</div>
+                <button class="close-btn" onclick="toggleModal('editModal', false)">✕</button>
             </div>
+
             <input type="hidden" id="editProductId">
-            <div class="form-group">
-                <label>Название</label>
-                <input type="text" id="editTitle" class="form-control">
+
+            <div class="filter-group">
+                <div class="filter-label">Название товара *</div>
+                <input type="text" id="editTitle" class="text-input">
             </div>
-            <div class="form-group">
-                <label>Категория</label>
-                <select id="editCategory" class="form-control">
-                    <option value="auto">🏎️ Авторынок</option>
-                    <option value="realty">🏰 Недвижимость</option>
+
+            <div class="filter-group">
+                <div class="filter-label">Вид товара *</div>
+                <select class="select-input" id="editCategory">
+                    <option value="auto">🏎️ Авторынок (Транспорт)</option>
+                    <option value="realty">🏰 Недвижимость (Дома/Квартиры)</option>
                     <option value="business">💎 Бизнес</option>
-                    <option value="skins">👕 Скины/Аксессуары</option>
-                    <option value="numbers">📞 Номера/Сим</option>
+                    <option value="skins">👕 Скины и Аксессуары</option>
+                    <option value="numbers">📞 Сим-карты и Номера</option>
                     <option value="other">📦 Прочее</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Сервер</label>
-                <input type="number" id="editServer" class="form-control">
+
+            <div class="filter-group">
+                <div class="filter-label">Сервер *</div>
+                <select class="select-input" id="editServer">
+                    <option value="1">Сервер #1</option>
+                    <option value="2">Сервер #2</option>
+                    <option value="3">Сервер #3</option>
+                    <option value="4">Сервер #4</option>
+                    <option value="5">Сервер #5</option>
+                    <option value="6">Сервер #6</option>
+                    <option value="7">Сервер #7</option>
+                </select>
             </div>
-            <div class="form-group">
-                <label>Цена (₽)</label>
-                <input type="number" id="editPrice" class="form-control">
+
+            <div class="filter-group">
+                <div class="filter-label">Цена (₽) *</div>
+                <input type="number" id="editPrice" class="number-input">
             </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="editUrgent">
-                <label for="editUrgent" style="margin: 0;">Срочная продажа</label>
+
+            <div class="urgent-toggle-wrapper">
+                <div class="urgent-title">
+                    <span>🔥</span>
+                    <span>Отметить как «СРОЧНО»</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="editUrgent">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <div class="form-group">
-                <label>Описание</label>
-                <textarea id="editDesc" class="form-control"></textarea>
+
+            <div class="filter-group">
+                <div class="filter-label">Описание товара *</div>
+                <textarea id="editDesc" class="textarea-input"></textarea>
             </div>
-            <button class="btn-primary" onclick="saveProductEdits()">Сохранить изменения</button>
+
+            <button class="btn-submit-full" onclick="saveProductEdits()">Сохранить изменения</button>
         </div>
     </div>
 
-    <!-- Product Details Modal -->
-    <div class="modal" id="productModal">
+    <!-- Модальное окно просмотра товара -->
+    <div class="modal-overlay" id="productModal">
         <div class="modal-content">
             <div class="modal-header">
-                <span id="pModalTag" class="card-tag">Активно</span>
-                <button class="modal-close" onclick="toggleModal('productModal', false)">✕</button>
+                <div class="modal-title">Объявление</div>
+                <button class="close-btn" onclick="toggleModal('productModal', false)">✕</button>
             </div>
-            <div id="pModalImg" style="height: 180px; background-size: cover; background-position: center; border-radius: 10px; margin-bottom: 12px;"></div>
-            <div id="pModalPrice" style="font-size: 20px; font-weight: 700; color: var(--accent-color); margin-bottom: 4px;"></div>
-            <h2 id="pModalTitle" style="font-size: 16px; margin-bottom: 8px;"></h2>
-            <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                <span id="pModalCategory"></span>
-                <span id="pModalServer"></span>
-            </div>
-            <div style="font-size: 13px; line-height: 1.5; margin-bottom: 16px;" id="pModalDesc"></div>
+            
+            <div class="product-modal-image" id="pModalImg"></div>
+            <div class="product-details-price" id="pModalPrice">0 ₽</div>
+            <div class="product-details-title" id="pModalTitle">Название товара</div>
 
-            <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">ПРОДАВЕЦ</div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div style="font-weight: 600; font-size: 14px;" id="pModalSiteNick"></div>
-                    <button style="background: none; border: none; color: var(--accent-color); font-size: 11px; cursor: pointer;" onclick="filterByCurrentAuthor()">Все лоты автора</button>
-                </div>
-                <div style="font-size: 12px; color: var(--text-secondary);">
-                    <div>🎮 Игровой ник: <b id="pModalNick" style="color: var(--text-main);"></b></div>
-                    <div>📞 Игровой тел: <b id="pModalPhone" style="color: var(--text-main);"></b></div>
-                </div>
-                <button style="width: 100%; margin-top: 8px; background: var(--border-color); color: white; border: none; padding: 6px; border-radius: 6px; font-size: 11px; cursor: pointer;" onclick="copyInGameInfo()">📋 Скопировать игровы данные</button>
+            <div class="product-tags">
+                <span class="tag-item" id="pModalCategory">📁 Категория</span>
+                <span class="tag-item" id="pModalServer">📍 Сервер #1</span>
+                <span class="tag-item" id="pModalTag">Характеристика</span>
             </div>
 
-            <div class="contact-links">
-                <a id="btnTg" href="#" target="_blank" class="contact-btn btn-tg">Написать в Telegram</a>
-                <a id="btnVk" href="#" target="_blank" class="contact-btn btn-vk">Открыть профиль VK</a>
-                <button id="btnDs" class="contact-btn btn-ds" onclick="copyDiscord()">Discord: <span id="pModalDs"></span></button>
-                <button class="btn-primary" onclick="openChatFromProduct()">💬 Написать в чат приложения</button>
+            <div class="product-desc" id="pModalDesc">
+                Описание товара...
+            </div>
+
+            <div class="seller-info-box">
+                <div>
+                    <div class="seller-info-title">Продавец на сайте</div>
+                    <div class="seller-site-nick" id="pModalSiteNick">Egor_Cred</div>
+                </div>
+                <span style="font-size: 20px;">👤</span>
+            </div>
+
+            <div class="contacts-title">Связаться с продавцом</div>
+            <div class="contacts-grid">
+                <button class="contact-btn btn-chat-author" onclick="openChatFromProduct()">
+                    💬 Чат с автором
+                </button>
+
+                <button class="contact-btn btn-ingame" onclick="copyInGameInfo()">
+                    🎮 В игре: <span id="pModalNick">Nick_Name</span> (тел: <span id="pModalPhone">123456</span>)
+                </button>
+
+                <!-- Соцсети с динамическим скрытием -->
+                <a href="#" target="_blank" class="contact-btn btn-tg" id="btnTg">✈️ Telegram</a>
+                <a href="#" target="_blank" class="contact-btn btn-vk" id="btnVk">🟦 ВКонтакте</a>
+                <button class="contact-btn btn-ds" id="btnDs" onclick="copyDiscord()">
+                    👾 Discord: <span id="pModalDs">user_ds</span>
+                </button>
+            </div>
+
+            <button class="btn-author-goods" onclick="filterByCurrentAuthor()">
+                <span>🛍️</span>
+                <span>Все товары автора (<strong id="pModalAuthorNick">Egor_Cred</strong>)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Модальное окно чата -->
+    <div class="modal-overlay" id="chatConversationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title" id="chatHeaderNick">Имя Продавца</div>
+                    <div style="font-size: 11px; color: var(--neon-blue);" id="chatHeaderProduct">📦 Товар</div>
+                </div>
+                <button class="close-btn" onclick="toggleModal('chatConversationModal', false)">✕</button>
+            </div>
+
+            <div class="chat-dialog-messages" id="chatMessagesList"></div>
+
+            <div class="chat-input-bar">
+                <input type="text" id="chatInput" class="text-input" placeholder="Напишите сообщение..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button class="btn-apply" style="width: auto; padding: 0 18px;" onclick="sendChatMessage()">Отправить</button>
             </div>
         </div>
     </div>
 
-    <!-- Filter Modal -->
-    <div class="modal" id="filterModal">
+    <!-- Модальное окно фильтров -->
+    <div class="modal-overlay" id="filterModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Фильтры поиска</h3>
-                <button class="modal-close" onclick="toggleModal('filterModal', false)">✕</button>
+                <div class="modal-title">🎛️ Фильтры поиска</div>
+                <button class="close-btn" onclick="toggleModal('filterModal', false)">✕</button>
             </div>
-            <div class="form-group">
-                <label>Категория</label>
-                <select id="categorySelect" class="form-control">
+
+            <div class="filter-group">
+                <div class="filter-label">Вид товара</div>
+                <select class="select-input" id="categorySelect">
                     <option value="all">Все категории</option>
-                    <option value="auto">🏎️ Авторынок</option>
-                    <option value="realty">🏰 Недвижимость</option>
+                    <option value="auto">🏎️ Авторынок (Транспорт)</option>
+                    <option value="realty">🏰 Недвижимость (Дома/Квартиры)</option>
                     <option value="business">💎 Бизнес</option>
-                    <option value="skins">👕 Скины/Аксессуары</option>
-                    <option value="numbers">📞 Номера/Сим</option>
+                    <option value="skins">👕 Скины и Аксессуары</option>
+                    <option value="numbers">📞 Сим-карты и Номера</option>
                     <option value="other">📦 Прочее</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Сервер</label>
-                <select id="serverSelect" class="form-control">
+
+            <div class="filter-group">
+                <div class="filter-label">Сервер</div>
+                <select class="select-input" id="serverSelect">
                     <option value="all">Все сервера</option>
                     <option value="1">Сервер #1</option>
                     <option value="2">Сервер #2</option>
                     <option value="3">Сервер #3</option>
+                    <option value="4">Сервер #4</option>
+                    <option value="5">Сервер #5</option>
+                    <option value="6">Сервер #6</option>
+                    <option value="7">Сервер #7</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Цена от (₽)</label>
-                <input type="number" id="priceFrom" class="form-control" placeholder="0">
+
+            <div class="filter-group">
+                <div class="filter-label">Цена (₽)</div>
+                <div class="price-inputs">
+                    <input type="number" class="number-input" placeholder="От 0" id="priceFrom">
+                    <input type="number" class="number-input" placeholder="До..." id="priceTo">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Цена до (₽)</label>
-                <input type="number" id="priceTo" class="form-control" placeholder="100000000">
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-primary" style="background: var(--border-color);" onclick="resetFilters()">Сбросить</button>
-                <button class="btn-primary" onclick="applyFilters()">Применить</button>
+
+            <div class="modal-actions">
+                <button class="btn-reset" onclick="resetFilters()">Сбросить</button>
+                <button class="btn-apply" onclick="applyFilters()">Применить</button>
             </div>
         </div>
     </div>
 
-    <!-- Chat Conversation Modal -->
-    <div class="modal" id="chatConversationModal">
-        <div class="modal-content" style="height: 80vh; display: flex; flex-direction: column;">
-            <div class="modal-header">
-                <div>
-                    <h3 id="chatHeaderNick">Чат</h3>
-                    <div id="chatHeaderProduct" style="font-size: 11px; color: var(--text-secondary);"></div>
-                </div>
-                <button class="modal-close" onclick="toggleModal('chatConversationModal', false)">✕</button>
-            </div>
-            <div id="chatMessagesList" style="flex: 1; overflow-y: auto; padding: 10px 0; display: flex; flex-direction: column;"></div>
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <input type="text" id="chatInput" class="form-control" placeholder="Введите сообщение..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <button class="btn-primary" style="width: auto; padding: 0 16px; margin: 0;" onclick="sendChatMessage()">➔</button>
-            </div>
-        </div>
+    <!-- Нижняя навигация -->
+    <div class="bottom-dock">
+        <a href="#" class="dock-tab active" onclick="switchTab(this, 'feed')">
+            <span class="icon">🔥</span>
+            <span>Лента</span>
+        </a>
+        <a href="#" class="dock-tab" onclick="switchTab(this, 'wishlist')">
+            <span class="icon">❤️</span>
+            <span>Желаемое</span>
+        </a>
+        <a href="#" class="dock-tab create-btn" onclick="switchTab(this, 'create')">
+            <span class="icon">➕</span>
+            <span>Продать</span>
+        </a>
+        <a href="#" class="dock-tab" onclick="switchTab(this, 'chats')">
+            <span class="icon">💬</span>
+            <span>Чаты</span>
+        </a>
+        <a href="#" class="dock-tab" onclick="switchTab(this, 'profile')">
+            <span class="icon">👤</span>
+            <span>Профиль</span>
+        </a>
     </div>
 
     <script>
@@ -736,9 +1027,9 @@
             tg.expand();
         }
 
-        // Профиль текущего пользователя (привязка к уникальному Telegram ID)
+        // 1. Привязка к Telegram ID пользователя для надежной идентификации
         let USER_PROFILE = {
-            tgId: tg?.initDataUnsafe?.user?.id || 77777777, // Неизменяемый ID
+            tgId: tg?.initDataUnsafe?.user?.id || 123456789,
             siteNick: tg?.initDataUnsafe?.user?.first_name || "МойПрофиль",
             gameNick: "EGOR_CRED",
             gamePhone: "777-888",
@@ -772,7 +1063,7 @@
                 image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400",
                 desc: "Продам отличную фт ст ф90. Внешний вид идеальный. Торг у капота.",
                 seller: {
-                    tgId: 77777777, // Telegram ID автора
+                    tgId: tg?.initDataUnsafe?.user?.id || 123456789, // Привязываем моковый товар к текущему юзеру по ID
                     siteNick: "МойПрофиль",
                     nick: "EGOR_CRED",
                     phone: "777-888",
@@ -797,7 +1088,7 @@
                 image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400",
                 desc: "Элитный дом на Рублевке с ремонтом хайтек, автополив.",
                 seller: {
-                    tgId: 99999999, // Другой пользователь
+                    tgId: 987654321,
                     siteNick: "Maxim_Imperator",
                     nick: "MAXIM_IMPERATOR",
                     phone: "100-001",
@@ -824,7 +1115,8 @@
             server: 'all',
             priceFrom: null,
             priceTo: null,
-            authorSiteNick: null
+            authorSiteNick: null,
+            authorTgId: null // Добавлено для надежной фильтрации по автору
         };
 
         // Инициализация формы профиля
@@ -871,25 +1163,24 @@
 
             USER_PROFILE.discord = document.getElementById('profDiscord').value.trim();
 
-            // Обновляем ники и контакты во всех ранее опубликованных товарах этого пользователя
-            PRODUCTS.forEach(p => {
-                if (p.seller.tgId === USER_PROFILE.tgId) {
-                    p.seller.siteNick = USER_PROFILE.siteNick;
-                    p.seller.nick = USER_PROFILE.gameNick;
-                    p.seller.phone = USER_PROFILE.gamePhone;
-                    p.seller.hasTg = USER_PROFILE.hasTg;
-                    p.seller.tg = USER_PROFILE.tgLink;
-                    p.seller.hasVk = USER_PROFILE.hasVk;
-                    p.seller.vk = USER_PROFILE.vkLink;
-                    p.seller.hasDs = Boolean(USER_PROFILE.discord);
-                    p.seller.discord = USER_PROFILE.discord;
+            // Автоматическое обновление данных продавца во всех его товарах при смене ника/настроек
+            PRODUCTS.forEach(product => {
+                if (product.seller.tgId === USER_PROFILE.tgId) {
+                    product.seller.siteNick = USER_PROFILE.siteNick;
+                    product.seller.nick = USER_PROFILE.gameNick;
+                    product.seller.phone = USER_PROFILE.gamePhone;
+                    product.seller.hasTg = USER_PROFILE.hasTg;
+                    product.seller.tg = USER_PROFILE.tgLink;
+                    product.seller.hasVk = USER_PROFILE.hasVk;
+                    product.seller.vk = USER_PROFILE.vkLink;
+                    product.seller.hasDs = Boolean(USER_PROFILE.discord);
+                    product.seller.discord = USER_PROFILE.discord;
                 }
             });
 
             tg?.HapticFeedback?.notificationOccurred('success');
-            alert('Настройки профиля и карточки ваших товаров обновлены!');
+            alert('Настройки профиля успешно сохранены!');
             renderProfileSection();
-            renderFeed();
         }
 
         // Рендер раздела Профиль и Моих лотов
@@ -897,7 +1188,7 @@
             const container = document.getElementById('myLotsContainer');
             container.innerHTML = '';
 
-            // Поиск лотов строго по уникальному tgId
+            // Фильтрация "Моих лотов" теперь идет строго по tgId
             const myProducts = PRODUCTS.filter(p => p.seller.tgId === USER_PROFILE.tgId);
             document.getElementById('myLotsCount').innerText = `${myProducts.length} шт`;
 
@@ -930,40 +1221,6 @@
             });
         }
 
-        // Рендер списка чатов
-        function renderChatsList(container) {
-            if (CHATS.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">💬</div>
-                        <div class="empty-title">У вас нет активных чатов</div>
-                        <div class="empty-text">Откройте карточку любого товара и нажмите "Написать в чат".</div>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = '';
-            CHATS.forEach(chat => {
-                const item = document.createElement('div');
-                item.className = 'chat-list-item';
-                item.onclick = () => openChatDialog(chat.id);
-                item.innerHTML = `
-                    <div style="font-size: 24px;">${chat.avatar}</div>
-                    <div style="flex: 1;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="font-weight: 600; font-size: 14px;">${chat.sellerSiteNick}</span>
-                            <span style="font-size: 10px; color: var(--text-secondary);">${chat.time}</span>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">📦 ${chat.productTitle}</div>
-                        <div style="font-size: 12px; color: var(--text-main); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${chat.lastMsg}</div>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        // Модальное окно редактирования своего лота
         function openEditProductModal(productId) {
             const product = PRODUCTS.find(p => p.id === productId);
             if (!product) return;
@@ -1023,7 +1280,41 @@
             }
         }
 
-        // Лента объявлений
+        // Исправлено: Добавлена отсутствующая функция рендера списка чатов
+        function renderChatsList(container) {
+            container.innerHTML = '';
+
+            if (CHATS.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <div class="empty-title">Нет активных чатов</div>
+                        <div class="empty-text">Начните диалог с продавцом на странице товара.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            CHATS.forEach(chat => {
+                const card = document.createElement('div');
+                card.className = 'chat-card';
+                card.onclick = () => openChatDialog(chat.id);
+                
+                card.innerHTML = `
+                    <div class="chat-avatar-box">${chat.avatar}</div>
+                    <div class="chat-main-info">
+                        <div class="chat-nick">
+                            <span>${chat.sellerSiteNick}</span>
+                            <span style="font-size: 10px; color: var(--text-secondary);">${chat.time}</span>
+                        </div>
+                        <div class="chat-product-sub">📦 ${chat.productTitle}</div>
+                        <div class="chat-last-text">${chat.lastMsg}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         function renderFeed() {
             const container = document.getElementById('feedContainer');
             container.innerHTML = '';
@@ -1039,7 +1330,8 @@
             const filteredItems = PRODUCTS.filter(item => {
                 if (currentTabMode === 'wishlist' && !likedProductIds.has(item.id)) return false;
 
-                if (activeFilters.authorSiteNick && item.seller.siteNick.toLowerCase() !== activeFilters.authorSiteNick.toLowerCase()) {
+                // Фильтр по автору теперь проверяет по надежному ID
+                if (activeFilters.authorTgId && item.seller.tgId !== activeFilters.authorTgId) {
                     return false;
                 }
 
@@ -1059,7 +1351,7 @@
 
             if (filteredItems.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state" style="grid-column: span 2;">
+                    <div class="empty-state">
                         <div class="empty-icon">🔍</div>
                         <div class="empty-title">Объявлений не найдено</div>
                         <div class="empty-text">Попробуйте изменить параметры поиска или сбросить фильтры.</div>
@@ -1096,7 +1388,6 @@
             });
         }
 
-        // Карточка товара
         function openProductDetails(productId) {
             const product = PRODUCTS.find(p => p.id === productId);
             if (!product) return;
@@ -1112,6 +1403,7 @@
             document.getElementById('pModalDesc').innerText = product.desc;
 
             document.getElementById('pModalSiteNick').innerText = product.seller.siteNick;
+            document.getElementById('pModalAuthorNick').innerText = product.seller.siteNick;
             document.getElementById('pModalNick').innerText = product.seller.nick;
             document.getElementById('pModalPhone').innerText = product.seller.phone;
 
@@ -1176,7 +1468,7 @@
                     titleElem.innerText = '❤️ Избранные товары';
                     document.getElementById('clearAuthorBtn').style.display = 'none';
                 } else if (tabMode === 'feed') {
-                    titleElem.innerText = activeFilters.authorSiteNick ? `🛍️ Товары автора: ${activeFilters.authorSiteNick}` : '🔥 Все объявления';
+                    titleElem.innerText = activeFilters.authorTgId ? `🛍️ Товары автора: ${activeFilters.authorSiteNick}` : '🔥 Все объявления';
                 } else if (tabMode === 'chats') {
                     titleElem.innerText = '💬 Мои чаты';
                     document.getElementById('clearAuthorBtn').style.display = 'none';
@@ -1216,7 +1508,7 @@
                 image: imgUrl,
                 desc: desc,
                 seller: {
-                    tgId: USER_PROFILE.tgId, // Закрепляем уникальный Telegram ID
+                    tgId: USER_PROFILE.tgId, // Привязываем объявление к ID
                     siteNick: USER_PROFILE.siteNick,
                     nick: USER_PROFILE.gameNick,
                     phone: USER_PROFILE.gamePhone,
@@ -1232,14 +1524,11 @@
             PRODUCTS.unshift(newProduct);
 
             document.getElementById('createTitle').value = '';
-            document.getElementById('createCategory').value = 'auto';
+            document.getElementById('createCategory').value = '';
             document.getElementById('createServer').value = '';
             document.getElementById('createPrice').value = '';
             document.getElementById('createUrgent').checked = false;
             document.getElementById('createDesc').value = '';
-            uploadedImageBase64 = null;
-            document.getElementById('uploadPreview').style.backgroundImage = 'none';
-            document.getElementById('uploadHint').style.display = 'block';
 
             tg?.HapticFeedback?.notificationOccurred('success');
             toggleModal('createModal', false);
@@ -1248,11 +1537,17 @@
             switchTab(feedTab, 'feed');
         }
 
-        // Вспомогательные функции
         function handleSearchInput(v) { activeFilters.searchQuery = v.trim().toLowerCase(); renderFeed(); }
-        function toggleLike(e, id) { e.stopPropagation(); likedProductIds.has(id) ? likedProductIds.delete(id) : likedProductIds.add(id); renderFeed(); }
+        
+        function toggleLike(e, id) { 
+            e.stopPropagation(); 
+            likedProductIds.has(id) ? likedProductIds.delete(id) : likedProductIds.add(id); 
+            renderFeed(); 
+        }
+        
         function toggleModal(id, show) { document.getElementById(id).classList.toggle('active', show); }
         function triggerFileInput(id) { document.getElementById(id).click(); }
+        
         function handleImageSelect(e, pId, hId) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1260,6 +1555,7 @@
             r.onload = function(ev) {
                 uploadedImageBase64 = ev.target.result;
                 document.getElementById(pId).style.backgroundImage = `url('${uploadedImageBase64}')`;
+                document.getElementById(pId).style.display = 'block';
                 document.getElementById(hId).style.display = 'none';
             };
             r.readAsDataURL(file);
@@ -1349,7 +1645,10 @@
 
         function filterByCurrentAuthor() {
             if (!currentActiveProduct) return;
+            // Привязка фильтрации по автору к Telegram ID
+            activeFilters.authorTgId = currentActiveProduct.seller.tgId;
             activeFilters.authorSiteNick = currentActiveProduct.seller.siteNick;
+            
             document.getElementById('sectionTitle').innerText = `🛍️ Товары автора: ${activeFilters.authorSiteNick}`;
             document.getElementById('clearAuthorBtn').style.display = 'inline-block';
             toggleModal('productModal', false);
@@ -1357,6 +1656,7 @@
         }
 
         function clearAuthorFilter() {
+            activeFilters.authorTgId = null;
             activeFilters.authorSiteNick = null;
             document.getElementById('sectionTitle').innerText = '🔥 Все объявления';
             document.getElementById('clearAuthorBtn').style.display = 'none';
@@ -1386,7 +1686,6 @@
             renderFeed();
         }
 
-        // Первичный рендер при загрузке
         renderFeed();
     </script>
 </body>
