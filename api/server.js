@@ -3,7 +3,10 @@ const TelegramBot = require('node-telegram-bot-api');
 const { Redis } = require('@upstash/redis');
 
 const app = express();
-app.use(express.json());
+
+// Увеличиваем лимит размера JSON, чтобы картинки в формате Base64 успешно сохранялись без ошибок 413 Payload Too Large
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID; 
@@ -36,7 +39,7 @@ app.post('/api/server', async (req, res) => {
         await bot.sendMessage(chatId, '👋 Бот доски объявлений РусьАвито работает!');
       }
 
-      // Команда удаления: /delete <ID>
+      // Удаление администратором через команду в админ-чате: /delete <ID>
       if (text.startsWith('/delete')) {
         const parts = text.split(/\s+/);
         const productId = Number(parts[1]);
@@ -50,7 +53,7 @@ app.post('/api/server', async (req, res) => {
 
           if (products.length < initialLength) {
             await redis.set('products', products);
-            await bot.sendMessage(chatId, `✅ <b>Объявление ID <code>${productId}</code> успешно удалено!</b>`, { parse_mode: 'HTML' });
+            await bot.sendMessage(chatId, `✅ <b>Объявление ID <code>${productId}</code> успешно удалено администратором!</b>`, { parse_mode: 'HTML' });
           } else {
             await bot.sendMessage(chatId, `⚠️ Объявление с ID <code>${productId}</code> не найдено в базе.`, { parse_mode: 'HTML' });
           }
@@ -58,7 +61,7 @@ app.post('/api/server', async (req, res) => {
       }
     }
 
-    // Удаление по кнопке в админ-чате
+    // Удаление по инлайн-кнопке в админ-чате
     if (update.callback_query) {
       const query = update.callback_query;
       const data = query.data;
@@ -137,7 +140,7 @@ app.post('/api/products', async (req, res) => {
 
     const catName = categoryNames[product.category] || "Прочее";
 
-    // Отправка карточки лота в Админ-чат
+    // Отправка карточки лота в Админ-чат с кнопкой и ID для удаления
     if (ADMIN_CHAT_ID) {
       await bot.sendMessage(ADMIN_CHAT_ID, 
         `📢 <b>НОВОЕ ОБЪЯВЛЕНИЕ</b>\n\n` +
@@ -148,7 +151,7 @@ app.post('/api/products', async (req, res) => {
         `📌 <b>Категория:</b> ${catName}\n` +
         `👤 <b>Продавец:</b> ${product.seller.siteNick} (Игровой: <code>${product.seller.nick}</code>, Тел: <code>${product.seller.phone}</code>)\n\n` +
         `📝 <b>Описание:</b> ${product.desc || 'Нет'}\n\n` +
-        `⚠️ <i>Удалить лот: <code>/delete ${product.id}</code> или нажмите кнопку ниже.</i>`,
+        `⚠️ <i>Удалить лот: <code>/delete ${product.id}</code></i>`,
         {
           parse_mode: 'HTML',
           reply_markup: {
@@ -161,7 +164,7 @@ app.post('/api/products', async (req, res) => {
       );
     }
 
-    // Публикация в канал
+    // Публикация в публичный канал
     if (CHANNEL_ID) {
       await bot.sendMessage(CHANNEL_ID, 
         `🔥 <b>Новое объявление на РусьАвито!</b>\n\n` +
@@ -191,6 +194,7 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
+// Удаление продукта через REST (если используется клиентом)
 app.delete('/api/products/:id', async (req, res) => {
   try {
     const productId = Number(req.params.id);
