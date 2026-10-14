@@ -11,7 +11,7 @@ const CHANNEL_ID = process.env.CHANNEL_ID;
 const BOT_USERNAME = process.env.BOT_USERNAME;    
 
 const bot = new TelegramBot(TOKEN);
-const redis = Redis.fromEnv(); // Подключение к Upstash Redis
+const redis = Redis.fromEnv();
 
 const categoryTags = {
   auto: "Авторынок",
@@ -22,27 +22,23 @@ const categoryTags = {
   other: "Прочее"
 };
 
-// ================= ОБРАБОТКА ВЕБХУКА TELEGRAM =================
-
+// ОБРАБОТЧИК ВЕБХУКА TELEGRAM
 app.post('/api/server', async (req, res) => {
   try {
     const update = req.body;
 
-    // 1. ПРЯМАЯ ОБРАБОТКА КОМАНД ИЗ ЧАТА В ВЕБХУКЕ
+    // 1. Текстовые команды
     if (update.message && update.message.text) {
       const text = update.message.text.trim();
       const chatId = update.message.chat.id;
       const lowerText = text.toLowerCase();
 
-      // Команда /start
       if (lowerText.startsWith('/start')) {
         await bot.sendMessage(chatId, '👋 Бот управления РусьАвито работает!');
       }
 
-      // Команда /setpay <сервер> <ник>
       if (lowerText.startsWith('/setpay')) {
         const parts = text.split(/\s+/);
-        // Очищаем номер сервера от символа '#'
         const serverStr = parts[1] ? parts[1].replace('#', '') : '';
         const nick = parts[2];
 
@@ -54,7 +50,6 @@ app.post('/api/server', async (req, res) => {
         }
       }
 
-      // Команда /setadmin <сервер> <id>
       if (lowerText.startsWith('/setadmin')) {
         const parts = text.split(/\s+/);
         const serverStr = parts[1] ? parts[1].replace('#', '') : '';
@@ -68,7 +63,6 @@ app.post('/api/server', async (req, res) => {
         }
       }
 
-      // Команда /settings_info
       if (lowerText.startsWith('/settings_info')) {
         const cashiers = await redis.hgetall('server_cashiers') || {};
         const admins = await redis.hgetall('server_admins') || {};
@@ -85,7 +79,7 @@ app.post('/api/server', async (req, res) => {
       }
     }
 
-    // 2. ОБРАБОТКА ИНЛАЙН-КНОПОК
+    // 2. Инлайн-кнопки
     if (update.callback_query) {
       const query = update.callback_query;
       const data = query.data;
@@ -95,7 +89,7 @@ app.post('/api/server', async (req, res) => {
       if (data.startsWith('delete_scam_')) {
         const productId = Number(data.replace('delete_scam_', ''));
         let products = await redis.get('products') || [];
-        products = products.filter(p => (p.id) !== productId);
+        products = products.filter(p => p.id !== productId);
         await redis.set('products', products);
 
         await bot.editMessageText(`❌ <b>Объявление удалено как Скам!</b> (ID: ${productId})`, {
@@ -155,8 +149,7 @@ app.post('/api/server', async (req, res) => {
   }
 });
 
-// ================= REST API ДЛЯ ВЕБ-САЙТА =================
-
+// REST API ДЛЯ ВЕБ-САЙТА
 app.get('/api/products', async (req, res) => {
   try {
     const products = await redis.get('products') || [];
@@ -213,7 +206,6 @@ app.post('/api/products', async (req, res) => {
     let badgeText = `#${catTag} #Сервер${product.server} #РусьАвито`;
     if (isVip) badgeText = `👑 <b>VIP ОБЪЯВЛЕНИЕ</b>\n` + badgeText;
 
-    // Пост в канал
     await bot.sendMessage(CHANNEL_ID, 
       `${isVip ? '👑 <b>VIP-ОБЪЯВЛЕНИЕ!</b>' : '🔥 <b>Новое объявление!</b>'}\n\n` +
       `🚗 <b>${product.title}</b>\n` +
@@ -230,7 +222,6 @@ app.post('/api/products', async (req, res) => {
       }
     );
 
-    // В админ-чат
     await bot.sendMessage(ADMIN_CHAT_ID, 
       `🛡️ <b>Новый лот на модерации</b> ${isVip ? '(👑 VIP)' : ''}\n\n` +
       `📌 <b>Категория:</b> #${catTag}\n` +
