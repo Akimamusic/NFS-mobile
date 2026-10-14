@@ -1015,9 +1015,13 @@
             tg.expand();
         }
 
-        let USER_PROFILE = {
-            tgId: tg?.initDataUnsafe?.user?.id || 123456789,
-            siteNick: tg?.initDataUnsafe?.user?.first_name || "МойПрофиль",
+        const defaultTgId = tg?.initDataUnsafe?.user?.id || 123456789;
+        const defaultName = tg?.initDataUnsafe?.user?.first_name || "МойПрофиль";
+
+        // Загрузка данных профиля и товаров из localStorage для предотвращения стирания
+        let USER_PROFILE = JSON.parse(localStorage.getItem(`rus_avito_profile_${defaultTgId}`)) || {
+            tgId: defaultTgId,
+            siteNick: defaultName,
             gameNick: "",
             gamePhone: "",
             arCoins: 0,
@@ -1028,6 +1032,8 @@
             discord: ""
         };
 
+        let PRODUCTS = JSON.parse(localStorage.getItem('rus_avito_products')) || [];
+
         const CATEGORY_NAMES = {
             auto: "🏎️ Авторынок",
             realty: "🏰 Недвижимость",
@@ -1037,7 +1043,6 @@
             other: "📦 Прочее"
         };
 
-        let PRODUCTS = [];
         let CHATS = [];
         let likedProductIds = new Set();
         let currentTabMode = 'feed';
@@ -1055,26 +1060,9 @@
             authorTgId: null
         };
 
-        // Загрузка данных профиля и товаров с сервера при старте
-        async function loadAppData() {
-            try {
-                const pRes = await fetch(`/api/profile/${USER_PROFILE.tgId}?defaultName=${encodeURIComponent(USER_PROFILE.siteNick)}`);
-                if (pRes.ok) {
-                    const pData = await pRes.json();
-                    USER_PROFILE.siteNick = pData.site_nick || USER_PROFILE.siteNick;
-                    USER_PROFILE.gameNick = pData.game_nick || '';
-                    USER_PROFILE.gamePhone = pData.game_phone || '';
-                    USER_PROFILE.arCoins = pData.ar_coins || 0;
-                }
-
-                const prRes = await fetch('/api/products');
-                if (prRes.ok) {
-                    PRODUCTS = await prRes.json();
-                }
-            } catch (e) {
-                console.error('Ошибка загрузки данных:', e);
-            }
-            renderFeed();
+        function saveLocalData() {
+            localStorage.setItem(`rus_avito_profile_${USER_PROFILE.tgId}`, JSON.stringify(USER_PROFILE));
+            localStorage.setItem('rus_avito_products', JSON.stringify(PRODUCTS));
         }
 
         function initProfileInputs() {
@@ -1099,7 +1087,7 @@
             document.getElementById(`box${type}Input`).style.display = isChecked ? 'block' : 'none';
         }
 
-        async function saveProfileSettings() {
+        function saveProfileSettings() {
             const siteNick = document.getElementById('profSiteNick').value.trim();
             const gameNick = document.getElementById('profGameNick').value.trim();
             const gamePhone = document.getElementById('profGamePhone').value.trim();
@@ -1118,55 +1106,17 @@
             USER_PROFILE.vkLink = document.getElementById('profVkLink').value.trim();
             USER_PROFILE.discord = document.getElementById('profDiscord').value.trim();
 
-            try {
-                await fetch('/api/profile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        tgId: USER_PROFILE.tgId,
-                        siteNick,
-                        gameNick,
-                        gamePhone,
-                        hasTg: USER_PROFILE.hasTg,
-                        tgLink: USER_PROFILE.tgLink,
-                        hasVk: USER_PROFILE.hasVk,
-                        vkLink: USER_PROFILE.vkLink,
-                        discord: USER_PROFILE.discord
-                    })
-                });
-
-                tg?.HapticFeedback?.notificationOccurred('success');
-                alert('Настройки профиля успешно сохранены!');
-                renderProfileSection();
-            } catch (e) {
-                alert('Не удалось сохранить настройки.');
-            }
-        }
-
-        // Обновление баланса AR Coins на сервере при списании
-        async function updateProfileCoinsServer() {
-            try {
-                await fetch('/api/profile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        tgId: USER_PROFILE.tgId,
-                        siteNick: USER_PROFILE.siteNick,
-                        gameNick: USER_PROFILE.gameNick,
-                        gamePhone: USER_PROFILE.gamePhone,
-                        arCoins: USER_PROFILE.arCoins
-                    })
-                });
-            } catch (e) {
-                console.error('Ошибка обновления баланса монет:', e);
-            }
+            saveLocalData();
+            tg?.HapticFeedback?.notificationOccurred('success');
+            alert('Настройки профиля успешно сохранены!');
+            renderProfileSection();
         }
 
         function renderProfileSection() {
             const container = document.getElementById('myLotsContainer');
             container.innerHTML = '';
 
-            const myProducts = PRODUCTS.filter(p => Number(p.seller_tg_id || p.seller?.tgId) === Number(USER_PROFILE.tgId));
+            const myProducts = PRODUCTS.filter(p => Number(p.seller?.tgId) === Number(USER_PROFILE.tgId));
             document.getElementById('myLotsCount').innerText = `${myProducts.length} шт`;
             document.getElementById('userArCoinsDisplay').innerText = `${USER_PROFILE.arCoins} AR`;
 
@@ -1182,7 +1132,7 @@
             myProducts.forEach(item => {
                 const row = document.createElement('div');
                 row.className = 'my-lot-item';
-                const prodId = item.product_id || item.id;
+                const prodId = item.id;
 
                 row.innerHTML = `
                     <div class="my-lot-img" style="background-image: url('${item.image}');"></div>
@@ -1199,17 +1149,13 @@
             });
         }
 
-        async function deleteMyProduct(productId) {
+        function deleteMyProduct(productId) {
             if (confirm("Вы точно хотите удалить это объявление?")) {
-                try {
-                    await fetch(`/api/products/${productId}`, { method: 'DELETE' });
-                    PRODUCTS = PRODUCTS.filter(p => (p.product_id || p.id) !== productId);
-                    tg?.HapticFeedback?.notificationOccurred('success');
-                    renderFeed();
-                    renderProfileSection();
-                } catch (e) {
-                    alert('Ошибка при удалении товара');
-                }
+                PRODUCTS = PRODUCTS.filter(p => p.id !== productId);
+                saveLocalData();
+                tg?.HapticFeedback?.notificationOccurred('success');
+                renderFeed();
+                renderProfileSection();
             }
         }
 
@@ -1258,10 +1204,10 @@
             }
 
             const filteredItems = PRODUCTS.filter(item => {
-                const pId = item.product_id || item.id;
+                const pId = item.id;
                 if (currentTabMode === 'wishlist' && !likedProductIds.has(pId)) return false;
 
-                const sellerTg = Number(item.seller_tg_id || item.seller?.tgId);
+                const sellerTg = Number(item.seller?.tgId);
                 if (activeFilters.authorTgId && sellerTg !== Number(activeFilters.authorTgId)) {
                     return false;
                 }
@@ -1275,7 +1221,7 @@
                 if (activeFilters.category !== 'all' && item.category !== activeFilters.category) return false;
                 if (activeFilters.server !== 'all' && String(item.server) !== String(activeFilters.server)) return false;
                 
-                const pNum = item.price_num || item.priceNum || 0;
+                const pNum = item.priceNum || 0;
                 if (activeFilters.priceFrom !== null && pNum < activeFilters.priceFrom) return false;
                 if (activeFilters.priceTo !== null && pNum > activeFilters.priceTo) return false;
 
@@ -1294,12 +1240,12 @@
             }
 
             filteredItems.forEach(item => {
-                const pId = item.product_id || item.id;
+                const pId = item.id;
                 const isLiked = likedProductIds.has(pId);
                 const card = document.createElement('div');
                 
-                const isVip = item.isVip || item.tag === '👑 VIP';
-                const isUrgent = item.isUrgent || item.tag === '🔥 СРОЧНО';
+                const isVip = item.isVip;
+                const isUrgent = item.isUrgent;
 
                 card.className = isVip ? 'card vip-card' : 'card';
                 card.onclick = () => openProductDetails(pId);
@@ -1315,7 +1261,7 @@
                     tagText = '🔥 СРОЧНО';
                 }
 
-                const sellerName = item.seller_site_nick || item.seller?.siteNick || 'Игрок';
+                const sellerName = item.seller?.siteNick || 'Игрок';
 
                 card.innerHTML = `
                     <div class="card-preview" style="background-image: url('${item.image}');">
@@ -1338,7 +1284,7 @@
         }
 
         function openProductDetails(productId) {
-            const product = PRODUCTS.find(p => (p.product_id || p.id) === productId);
+            const product = PRODUCTS.find(p => p.id === productId);
             if (!product) return;
 
             currentActiveProduct = product;
@@ -1351,9 +1297,9 @@
             document.getElementById('pModalTag').innerText = product.tag || 'Активно';
             document.getElementById('pModalDesc').innerText = product.desc || '';
 
-            const siteNick = product.seller_site_nick || product.seller?.siteNick || 'Игрок';
-            const gameNick = product.seller_nick || product.seller?.nick || 'Nick';
-            const gamePhone = product.seller_phone || product.seller?.phone || '000-000';
+            const siteNick = product.seller?.siteNick || 'Игрок';
+            const gameNick = product.seller?.nick || 'Nick';
+            const gamePhone = product.seller?.phone || '000-000';
 
             document.getElementById('pModalSiteNick').innerText = siteNick;
             document.getElementById('pModalAuthorNick').innerText = siteNick;
@@ -1407,7 +1353,7 @@
             }
         }
 
-        // Публикация нового объявления с поддержкой VIP за 10 AR Coins
+        // Публикация нового объявления с VIP за 10 AR и отправкой в админ-чат
         async function submitNewProduct() {
             const title = document.getElementById('createTitle').value.trim();
             const category = document.getElementById('createCategory').value;
@@ -1422,14 +1368,13 @@
                 return;
             }
 
-            // Проверка баланса и списание 10 AR Coins для VIP
             if (isVip) {
                 if (USER_PROFILE.arCoins < 10) {
                     alert('❌ Недостаточно AR Coins! VIP-объявление стоит 10 AR. Пополните баланс в профиле.');
                     return;
                 }
                 USER_PROFILE.arCoins -= 10;
-                await updateProfileCoinsServer();
+                saveLocalData();
             }
 
             const priceNum = Number(priceVal);
@@ -1441,6 +1386,7 @@
             else if (isUrgent) tagText = '🔥 СРОЧНО';
 
             const payload = {
+                id: Date.now(),
                 title,
                 category,
                 server: Number(server),
@@ -1459,26 +1405,32 @@
                 }
             };
 
+            // Сохраняем локально, чтобы товар никогда не пропадал
+            PRODUCTS.unshift(payload);
+            saveLocalData();
+
+            // Отправляем уведомление на бэкенд в админ-чат
             try {
-                const res = await fetch('/api/products', {
+                await fetch('/api/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
-                if (res.ok) {
-                    toggleModal('createModal', false);
-                    document.getElementById('createVip').checked = false; // сброс тумблера
-                    await loadAppData();
-                    alert(isVip ? '👑 VIP-объявление успешно опубликовано (списано 10 AR)!' : 'Объявление опубликовано!');
-                    const feedTab = document.querySelectorAll('.dock-tab')[0];
-                    switchTab(feedTab, 'feed');
-                } else {
-                    alert('Ошибка при публикации товара.');
-                }
             } catch (e) {
-                alert('Не удалось отправить объявление.');
+                console.error('Ошибка отправки в админ-чат:', e);
             }
+
+            toggleModal('createModal', false);
+            document.getElementById('createVip').checked = false;
+            document.getElementById('createUrgent').checked = false;
+            document.getElementById('createTitle').value = '';
+            document.getElementById('createPrice').value = '';
+            document.getElementById('createDesc').value = '';
+
+            renderFeed();
+            alert(isVip ? '👑 VIP-объявление опубликовано (списано 10 AR)!' : 'Объявление успешно опубликовано!');
+            const feedTab = document.querySelectorAll('.dock-tab')[0];
+            switchTab(feedTab, 'feed');
         }
 
         // Пополнение AR Coins
@@ -1541,8 +1493,8 @@
 
         function copyInGameInfo() {
             if (!currentActiveProduct) return;
-            const gameNick = currentActiveProduct.seller_nick || currentActiveProduct.seller?.nick || 'Nick';
-            const gamePhone = currentActiveProduct.seller_phone || currentActiveProduct.seller?.phone || '000';
+            const gameNick = currentActiveProduct.seller?.nick || 'Nick';
+            const gamePhone = currentActiveProduct.seller?.phone || '000';
             const t = `Ник: ${gameNick}, Тел: ${gamePhone}`;
             navigator.clipboard.writeText(t);
             alert(`Скопировано:\n${t}`);
@@ -1556,7 +1508,7 @@
 
         function openChatFromProduct() {
             if (!currentActiveProduct) return;
-            const sellerNick = currentActiveProduct.seller_site_nick || currentActiveProduct.seller?.siteNick || 'Продавец';
+            const sellerNick = currentActiveProduct.seller?.siteNick || 'Продавец';
             const productTitle = currentActiveProduct.title;
 
             let existingChat = CHATS.find(c => c.sellerSiteNick === sellerNick && c.productTitle === productTitle);
@@ -1625,8 +1577,8 @@
 
         function filterByCurrentAuthor() {
             if (!currentActiveProduct) return;
-            activeFilters.authorTgId = currentActiveProduct.seller_tg_id || currentActiveProduct.seller?.tgId;
-            activeFilters.authorSiteNick = currentActiveProduct.seller_site_nick || currentActiveProduct.seller?.siteNick;
+            activeFilters.authorTgId = currentActiveProduct.seller?.tgId;
+            activeFilters.authorSiteNick = currentActiveProduct.seller?.siteNick;
             
             document.getElementById('sectionTitle').innerText = `🛍️ Товары автора: ${activeFilters.authorSiteNick}`;
             document.getElementById('clearAuthorBtn').style.display = 'inline-block';
@@ -1665,8 +1617,8 @@
             renderFeed();
         }
 
-        // Запуск при старте
-        loadAppData();
+        // Первичный запуск отрисовки
+        renderFeed();
     </script>
 </body>
 </html>
