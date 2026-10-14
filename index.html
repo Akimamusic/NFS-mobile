@@ -371,6 +371,30 @@
         .btn-lot-edit { background: rgba(0, 242, 254, 0.15); border: 1px solid var(--neon-blue); color: var(--neon-blue); }
         .btn-lot-delete { background: rgba(255, 42, 95, 0.15); border: 1px solid var(--neon-red); color: var(--neon-red); }
 
+        /* ЧАТЫ */
+        .chat-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .chat-avatar-box {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+            display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+        }
+
+        .chat-main-info { flex-grow: 1; overflow: hidden; }
+        .chat-nick { font-size: 14px; font-weight: 800; color: #fff; display: flex; justify-content: space-between; }
+        .chat-product-sub { font-size: 11px; color: var(--neon-blue); font-weight: 600; margin: 2px 0 4px; }
+        .chat-last-text { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
         /* Модальные окна */
         .modal-overlay {
             position: fixed;
@@ -528,123 +552,6 @@
         .btn-apply { width: 65%; background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple)); border: none; color: #fff; padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; }
         .btn-submit-full { width: 100%; background: linear-gradient(135deg, var(--neon-green), #00b09b); border: none; color: #000; padding: 16px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
 
-        /* Просмотр товара */
-        .product-modal-image {
-            width: 100%;
-            height: 200px;
-            border-radius: 20px;
-            background-size: cover;
-            background-position: center;
-            margin-bottom: 16px;
-        }
-
-        .product-details-price { font-size: 24px; font-weight: 900; color: var(--neon-green); margin-bottom: 6px; }
-        .product-details-title { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
-
-        .product-tags { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-        .tag-item { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 10px; font-size: 12px; color: var(--text-secondary); }
-
-        .product-desc {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 14px;
-            font-size: 13px;
-            line-height: 1.5;
-            color: #d1d5db;
-            margin-bottom: 20px;
-        }
-
-        .seller-info-box {
-            background: rgba(0, 242, 254, 0.06);
-            border: 1px solid rgba(0, 242, 254, 0.25);
-            padding: 12px 16px;
-            border-radius: 14px;
-            font-size: 13px;
-            color: #fff;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .seller-info-title { color: var(--text-secondary); font-size: 11px; text-transform: uppercase; font-weight: 700; }
-        .seller-site-nick { font-size: 15px; font-weight: 900; color: var(--neon-blue); }
-
-        .contacts-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 10px; }
-        .contacts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-
-        .contact-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-chat-author { grid-column: span 2; background: linear-gradient(135deg, var(--neon-blue), #00b09b); color: #000; font-weight: 800; font-size: 14px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
-        .btn-ingame { background: rgba(0, 255, 136, 0.15); border: 1px solid var(--neon-green); color: var(--neon-green); grid-column: span 2; }
-        .btn-tg { background: var(--tg-blue); }
-        .btn-vk { background: var(--vk-blue); }
-        .btn-ds { background: var(--ds-purple); grid-column: span 2; }
-
-        .btn-author-goods {
-            width: 100%;
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(155, 81, 224, 0.15));
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            font-size: 13px;
-            font-weight: 700;
-            padding: 12px;
-            border-radius: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        /* ЧАТЫ */
-        .chat-card {
-            background: var(--glass-card);
-            border: 1px solid var(--glass-border);
-            border-radius: 18px;
-            padding: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-
-        .chat-avatar-box {
-            width: 48px; height: 48px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
-            display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
-        }
-
-        .chat-main-info { flex-grow: 1; overflow: hidden; }
-        .chat-nick { font-size: 14px; font-weight: 800; color: #fff; display: flex; justify-content: space-between; }
-        .chat-product-sub { font-size: 11px; color: var(--neon-blue); font-weight: 600; margin: 2px 0 4px; }
-        .chat-last-text { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .chat-dialog-messages {
-            display: flex; flex-direction: column; gap: 10px; max-height: 55vh; min-height: 250px; overflow-y: auto; padding: 10px 0;
-        }
-
-        .msg-bubble { max-width: 82%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; word-break: break-word; }
-        .msg-bubble.them { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); align-self: flex-start; border-bottom-left-radius: 4px; color: #fff; }
-        .msg-bubble.me { background: linear-gradient(135deg, var(--neon-blue), #00b09b); color: #000; font-weight: 700; align-self: flex-end; border-bottom-right-radius: 4px; }
-
-        .chat-input-bar { display: flex; gap: 8px; margin-top: 14px; }
-
         /* Нижняя навигация */
         .bottom-dock {
             position: fixed;
@@ -689,7 +596,7 @@
         <button id="clearAuthorBtn" class="clear-author-btn" style="display: none;" onclick="clearAuthorFilter()">✖ Сбросить автора</button>
     </div>
 
-    <!-- Лента товаров и Чаты -->
+    <!-- Лента товаров, Чаты и прочее -->
     <div class="market-feed" id="feedContainer"></div>
 
     <!-- РАЗДЕЛ ПРОФИЛЬ -->
@@ -737,7 +644,6 @@
                 <input type="text" id="profGamePhone" class="text-input" placeholder="например: 123-456">
             </div>
 
-            <!-- Тумблер и поле Telegram -->
             <div class="filter-group">
                 <div class="social-toggle-row">
                     <span class="social-toggle-label">✈️ Telegram</span>
@@ -751,7 +657,6 @@
                 </div>
             </div>
 
-            <!-- Тумблер и поле ВКонтакте -->
             <div class="filter-group">
                 <div class="social-toggle-row">
                     <span class="social-toggle-label">🟦 ВКонтакте</span>
@@ -900,139 +805,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО: Редактирование объявления -->
-    <div class="modal-overlay" id="editModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">✏️ Редактировать лот</div>
-                <button class="close-btn" onclick="toggleModal('editModal', false)">✕</button>
-            </div>
-
-            <input type="hidden" id="editProductId">
-
-            <div class="filter-group">
-                <div class="filter-label">Название товара *</div>
-                <input type="text" id="editTitle" class="text-input">
-            </div>
-
-            <div class="filter-group">
-                <div class="filter-label">Вид товара *</div>
-                <select class="select-input" id="editCategory">
-                    <option value="auto">🏎️ Авторынок (Транспорт)</option>
-                    <option value="realty">🏰 Недвижимость (Дома/Квартиры)</option>
-                    <option value="business">💎 Бизнес</option>
-                    <option value="skins">👕 Скины и Аксессуары</option>
-                    <option value="numbers">📞 Сим-карты и Номера</option>
-                    <option value="other">📦 Прочее</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <div class="filter-label">Сервер *</div>
-                <select class="select-input" id="editServer">
-                    <option value="1">Сервер #1</option>
-                    <option value="2">Сервер #2</option>
-                    <option value="3">Сервер #3</option>
-                    <option value="4">Сервер #4</option>
-                    <option value="5">Сервер #5</option>
-                    <option value="6">Сервер #6</option>
-                    <option value="7">Сервер #7</option>
-                    <option value="8">Сервер #8</option>
-                    <option value="9">Сервер #9</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <div class="filter-label">Цена (₽) *</div>
-                <input type="number" id="editPrice" class="number-input">
-            </div>
-
-            <div class="urgent-toggle-wrapper">
-                <div class="urgent-title">
-                    <span>🔥</span>
-                    <span>Отметить как «СРОЧНО»</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="editUrgent">
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="urgent-toggle-wrapper" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.25);">
-                <div class="urgent-title">
-                    <span>⭐</span>
-                    <span>VIP объявление (10 AR Coins)</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="editVip">
-                    <span class="slider vip-slider"></span>
-                </label>
-            </div>
-
-            <div class="filter-group">
-                <div class="filter-label">Описание товара *</div>
-                <textarea id="editDesc" class="textarea-input"></textarea>
-            </div>
-
-            <button class="btn-submit-full" onclick="saveProductEdits()">Сохранить изменения</button>
-        </div>
-    </div>
-
-    <!-- Модальное окно просмотра товара -->
-    <div class="modal-overlay" id="productModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Объявление</div>
-                <button class="close-btn" onclick="toggleModal('productModal', false)">✕</button>
-            </div>
-            
-            <div class="product-modal-image" id="pModalImg"></div>
-            <div class="product-details-price" id="pModalPrice">0 ₽</div>
-            <div class="product-details-title" id="pModalTitle">Название товара</div>
-
-            <div class="product-tags">
-                <span class="tag-item" id="pModalCategory">📁 Категория</span>
-                <span class="tag-item" id="pModalServer">📍 Сервер #1</span>
-                <span class="tag-item" id="pModalTag">Характеристика</span>
-            </div>
-
-            <div class="product-desc" id="pModalDesc">
-                Описание товара...
-            </div>
-
-            <div class="seller-info-box">
-                <div>
-                    <div class="seller-info-title">Продавец на сайте</div>
-                    <div class="seller-site-nick" id="pModalSiteNick">-</div>
-                </div>
-                <span style="font-size: 20px;">👤</span>
-            </div>
-
-            <div class="contacts-title">Связаться с продавцом</div>
-            <div class="contacts-grid">
-                <button class="contact-btn btn-chat-author" onclick="openChatFromProduct()">
-                    💬 Чат с автором
-                </button>
-
-                <button class="contact-btn btn-ingame" onclick="copyInGameInfo()">
-                    🎮 В игре: <span id="pModalNick">Nick_Name</span> (тел: <span id="pModalPhone">123456</span>)
-                </button>
-
-                <a href="#" target="_blank" class="contact-btn btn-tg" id="btnTg">✈️ Telegram</a>
-                <a href="#" target="_blank" class="contact-btn btn-vk" id="btnVk">🟦 ВКонтакте</a>
-                <button class="contact-btn btn-ds" id="btnDs" onclick="copyDiscord()">
-                    👾 Discord: <span id="pModalDs">user_ds</span>
-                </button>
-            </div>
-
-            <button class="btn-author-goods" onclick="filterByCurrentAuthor()">
-                <span>🛍️</span>
-                <span>Все товары автора (<strong id="pModalAuthorNick">-</strong>)</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Модальное окно фильтров -->
+    <!-- МОДАЛЬНОЕ ОКНО: Фильтры -->
     <div class="modal-overlay" id="filterModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1115,7 +888,6 @@
             tg.expand();
         }
 
-        // Автоматически берем Telegram ID и Имя из окружения Telegram
         let USER_PROFILE = {
             tgId: tg?.initDataUnsafe?.user?.id || 0,
             siteNick: tg?.initDataUnsafe?.user?.first_name || "",
@@ -1139,12 +911,10 @@
             other: "📦 Прочее"
         };
 
-        // Чистый массив товаров (подгружается динамически с бэкенда)
         const PRODUCTS = [];
         let CHATS = [];
         let likedProductIds = new Set();
         let currentTabMode = 'feed';
-        let currentActiveProduct = null;
         let uploadedImageBase64 = null;
 
         let activeFilters = {
@@ -1215,7 +985,6 @@
                 payPhone: null
             };
 
-            // В бэкенд пересылаются реальные параметры пользователя для обработки в админ-чате
             toggleModal('topupModal', false);
             renderTopupStatusBlock();
             tg?.HapticFeedback?.notificationOccurred('success');
@@ -1245,7 +1014,7 @@
             else if (topup.status === 'ready_to_pay') {
                 titleElem.innerText = '🎮 Перевод средств в игре';
                 textElem.innerHTML = `Администратор разрешил оплату!<br><br>` +
-                    `Переведите сумму <b>${topup.rubles.toLocaleString('ru-RU')} ₽</b> в игре на след. реквизиты:<br>` +
+                    `Переведите сумму <b>${topup.rubles.toLocaleString('ru-RU')} ₽</b> в игре на реквизиты:<br>` +
                     `👤 Ник: <strong style="color:var(--neon-green)">${topup.payNick || 'Уточняется в боте'}</strong><br>` +
                     `📞 Телефон: <strong style="color:var(--neon-blue)">${topup.payPhone || 'Уточняется в боте'}</strong><br><br>` +
                     `После перевода нажмите кнопку ниже:`;
@@ -1352,6 +1121,39 @@
             }
         }
 
+        function renderChatsList(container) {
+            container.innerHTML = '';
+
+            if (CHATS.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <div class="empty-title">У вас пока нет чатов</div>
+                        <div class="empty-text">Откройте любое объявление и начните диалог с продавцом.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            CHATS.forEach(chat => {
+                const chatCard = document.createElement('div');
+                chatCard.className = 'chat-card';
+                chatCard.onclick = () => openChatDialog(chat.id);
+                chatCard.innerHTML = `
+                    <div class="chat-avatar-box">👤</div>
+                    <div class="chat-main-info">
+                        <div class="chat-nick">
+                            <span>${chat.sellerNick}</span>
+                            <span style="font-size:10px; color:var(--text-secondary); font-weight:normal;">${chat.lastTime || ''}</span>
+                        </div>
+                        <div class="chat-product-sub">📦 ${chat.productTitle}</div>
+                        <div class="chat-last-text">${chat.lastMessage || 'Нажмите, чтобы открыть диалог'}</div>
+                    </div>
+                `;
+                container.appendChild(chatCard);
+            });
+        }
+
         function switchTab(element, tabMode) {
             if (tabMode === 'create') {
                 toggleModal('createModal', true);
@@ -1374,11 +1176,22 @@
                 titleElem.innerText = '👤 Профиль и кошелек';
                 initProfileInputs();
                 renderProfileSection();
+            } else if (tabMode === 'chats') {
+                feedContainer.style.display = 'block';
+                profileSection.style.display = 'none';
+                searchBarBox.style.display = 'none';
+                titleElem.innerText = '💬 Ваши диалоги';
+                renderChatsList(feedContainer);
             } else {
                 feedContainer.style.display = 'grid';
                 profileSection.style.display = 'none';
                 searchBarBox.style.display = 'flex';
-                titleElem.innerText = '🔥 Все объявления';
+                
+                if (tabMode === 'wishlist') {
+                    titleElem.innerText = '❤️ Избранные товары';
+                } else {
+                    titleElem.innerText = '🔥 Все объявления';
+                }
                 renderFeed();
             }
         }
