@@ -150,6 +150,21 @@
             gap: 14px;
         }
 
+        /* VIP Секция */
+        .vip-section-title {
+            grid-column: span 2;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--neon-blue);
+            margin-top: 6px;
+            margin-bottom: -4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .card {
             background: var(--glass-card);
             backdrop-filter: blur(10px);
@@ -159,6 +174,12 @@
             position: relative;
             cursor: pointer;
             transition: transform 0.2s;
+        }
+
+        .card.vip-card {
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
+            background: linear-gradient(135deg, rgba(26, 22, 48, 0.85), rgba(0, 242, 254, 0.08));
         }
 
         .card:active { transform: scale(0.98); }
@@ -188,6 +209,12 @@
             background: rgba(255, 42, 95, 0.85);
             color: #fff;
             box-shadow: 0 0 10px rgba(255, 42, 95, 0.5);
+        }
+
+        .card-tag.vip {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
         }
 
         .like-btn {
@@ -489,6 +516,11 @@
             box-shadow: 0 0 10px rgba(255, 42, 95, 0.5);
         }
 
+        input:checked + .slider.vip-slider {
+            background-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+
         input:checked + .slider:before { transform: translateX(20px); }
 
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
@@ -662,6 +694,30 @@
 
     <!-- РАЗДЕЛ ПРОФИЛЬ -->
     <div class="profile-wrapper" id="profileSection">
+        <!-- Кошелек и AR Coins -->
+        <div class="profile-card">
+            <div class="profile-card-title">💳 Кошелек & AR Coins</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); padding: 14px; border-radius: 14px;">
+                <div>
+                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Баланс кошелька</div>
+                    <div style="font-size: 22px; font-weight: 900; color: var(--neon-green);" id="userArCoinsDisplay">0 AR</div>
+                </div>
+                <button class="btn-apply" style="width: auto; padding: 10px 16px; font-size: 13px;" onclick="openTopUpModal()">➕ Пополнить</button>
+            </div>
+
+            <!-- Блок статуса активной заявки на пополнение -->
+            <div id="topupStatusContainer" style="display: none; margin-bottom: 14px; background: rgba(0,242,254,0.08); border: 1px solid rgba(0,242,254,0.3); padding: 14px; border-radius: 14px;">
+                <div style="font-size: 12px; font-weight: 800; color: var(--neon-blue); margin-bottom: 6px;" id="topupStatusTitle">🔄 Заявка на пополнение</div>
+                <div style="font-size: 12px; color: #fff; line-height: 1.4; margin-bottom: 10px;" id="topupStatusText">Ожидание ответа администратора...</div>
+                <div id="topupActionBox"></div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                💡 Тариф: <strong>1 AR Coin = 5.000 игровых рублей</strong>.<br>
+                Стоимость VIP-объявления: <strong>10 AR Coins</strong>.
+            </div>
+        </div>
+
         <!-- Настройки профиля -->
         <div class="profile-card">
             <div class="profile-card-title">⚙️ Настройки профиля</div>
@@ -673,12 +729,12 @@
 
             <div class="filter-group">
                 <div class="filter-label">Ник в игре (RolePlay) *</div>
-                <input type="text" id="profGameNick" class="text-input" placeholder="например: Egor_Cred">
+                <input type="text" id="profGameNick" class="text-input" placeholder="например: Nick_Name">
             </div>
 
             <div class="filter-group">
                 <div class="filter-label">Номер телефона в игре *</div>
-                <input type="text" id="profGamePhone" class="text-input" placeholder="например: 777-888">
+                <input type="text" id="profGamePhone" class="text-input" placeholder="например: 123-456">
             </div>
 
             <!-- Тумблер и поле Telegram -->
@@ -729,6 +785,34 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО: Пополнение AR Coins -->
+    <div class="modal-overlay" id="topupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">💳 Пополнение AR Coins</div>
+                <button class="close-btn" onclick="toggleModal('topupModal', false)">✕</button>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-label">Количество AR Coins *</div>
+                <input type="number" id="topupCoinsInput" class="number-input" placeholder="Введите количество коинов" oninput="calculateTopup(this.value)">
+            </div>
+
+            <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px; margin-bottom: 16px; font-size: 13px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="color: var(--text-secondary);">К зачислению:</span>
+                    <strong style="color: var(--neon-green);" id="topupResultCoins">0 AR</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary);">Стоимость в игре:</span>
+                    <strong style="color: #fff;" id="topupResultRubles">0 ₽</strong>
+                </div>
+            </div>
+
+            <button class="btn-submit-full" onclick="submitTopUpRequest()">📤 Отправить запрос администратору</button>
+        </div>
+    </div>
+
     <!-- МОДАЛЬНОЕ ОКНО: Создание объявления -->
     <div class="modal-overlay" id="createModal">
         <div class="modal-content">
@@ -739,7 +823,7 @@
 
             <div class="filter-group">
                 <div class="filter-label">Название товара *</div>
-                <input type="text" id="createTitle" class="text-input" placeholder="BMW M5 F90">
+                <input type="text" id="createTitle" class="text-input" placeholder="Например: BMW M5 F90">
             </div>
 
             <div class="filter-group">
@@ -766,6 +850,8 @@
                     <option value="5">Сервер #5</option>
                     <option value="6">Сервер #6</option>
                     <option value="7">Сервер #7</option>
+                    <option value="8">Сервер #8</option>
+                    <option value="9">Сервер #9</option>
                 </select>
             </div>
 
@@ -774,19 +860,16 @@
                 <input type="number" id="createPrice" class="number-input" placeholder="Стоимость в рублях">
             </div>
 
-            <div class="filter-group">
-                <div class="filter-label">Прикрепить фото *</div>
-                <div class="photo-upload-box" onclick="triggerFileInput('photoFileInput')">
-                    <div id="uploadPlaceholder">
-                        <div style="font-size: 28px; margin-bottom: 4px;">📷</div>
-                        <div style="font-size: 12px; font-weight: 700; color: #fff;">Загрузить фото</div>
-                    </div>
-                    <div class="photo-preview" id="photoPreview"></div>
+            <div class="photo-upload-box" onclick="triggerFileInput('photoFileInput')">
+                <div id="uploadPlaceholder">
+                    <div style="font-size: 28px; margin-bottom: 4px;">📷</div>
+                    <div style="font-size: 12px; font-weight: 700; color: #fff;">Загрузить фото</div>
                 </div>
-                <input type="file" id="photoFileInput" class="file-input-hidden" accept="image/*" onchange="handleImageSelect(event, 'photoPreview', 'uploadPlaceholder')">
+                <div class="photo-preview" id="photoPreview"></div>
             </div>
+            <input type="file" id="photoFileInput" class="file-input-hidden" accept="image/*" onchange="handleImageSelect(event, 'photoPreview', 'uploadPlaceholder')">
 
-            <div class="urgent-toggle-wrapper">
+            <div class="urgent-toggle-wrapper" style="margin-top: 16px;">
                 <div class="urgent-title">
                     <span>🔥</span>
                     <span>Отметить как «СРОЧНО»</span>
@@ -794,6 +877,17 @@
                 <label class="switch">
                     <input type="checkbox" id="createUrgent">
                     <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="urgent-toggle-wrapper" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.25);">
+                <div class="urgent-title">
+                    <span>⭐</span>
+                    <span>VIP объявление (10 AR Coins)</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="createVip">
+                    <span class="slider vip-slider"></span>
                 </label>
             </div>
 
@@ -843,6 +937,8 @@
                     <option value="5">Сервер #5</option>
                     <option value="6">Сервер #6</option>
                     <option value="7">Сервер #7</option>
+                    <option value="8">Сервер #8</option>
+                    <option value="9">Сервер #9</option>
                 </select>
             </div>
 
@@ -859,6 +955,17 @@
                 <label class="switch">
                     <input type="checkbox" id="editUrgent">
                     <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="urgent-toggle-wrapper" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.25);">
+                <div class="urgent-title">
+                    <span>⭐</span>
+                    <span>VIP объявление (10 AR Coins)</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="editVip">
+                    <span class="slider vip-slider"></span>
                 </label>
             </div>
 
@@ -896,7 +1003,7 @@
             <div class="seller-info-box">
                 <div>
                     <div class="seller-info-title">Продавец на сайте</div>
-                    <div class="seller-site-nick" id="pModalSiteNick">Egor_Cred</div>
+                    <div class="seller-site-nick" id="pModalSiteNick">-</div>
                 </div>
                 <span style="font-size: 20px;">👤</span>
             </div>
@@ -911,7 +1018,6 @@
                     🎮 В игре: <span id="pModalNick">Nick_Name</span> (тел: <span id="pModalPhone">123456</span>)
                 </button>
 
-                <!-- Соцсети с динамическим скрытием -->
                 <a href="#" target="_blank" class="contact-btn btn-tg" id="btnTg">✈️ Telegram</a>
                 <a href="#" target="_blank" class="contact-btn btn-vk" id="btnVk">🟦 ВКонтакте</a>
                 <button class="contact-btn btn-ds" id="btnDs" onclick="copyDiscord()">
@@ -921,28 +1027,8 @@
 
             <button class="btn-author-goods" onclick="filterByCurrentAuthor()">
                 <span>🛍️</span>
-                <span>Все товары автора (<strong id="pModalAuthorNick">Egor_Cred</strong>)</span>
+                <span>Все товары автора (<strong id="pModalAuthorNick">-</strong>)</span>
             </button>
-        </div>
-    </div>
-
-    <!-- Модальное окно чата -->
-    <div class="modal-overlay" id="chatConversationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div>
-                    <div class="modal-title" id="chatHeaderNick">Имя Продавца</div>
-                    <div style="font-size: 11px; color: var(--neon-blue);" id="chatHeaderProduct">📦 Товар</div>
-                </div>
-                <button class="close-btn" onclick="toggleModal('chatConversationModal', false)">✕</button>
-            </div>
-
-            <div class="chat-dialog-messages" id="chatMessagesList"></div>
-
-            <div class="chat-input-bar">
-                <input type="text" id="chatInput" class="text-input" placeholder="Напишите сообщение..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <button class="btn-apply" style="width: auto; padding: 0 18px;" onclick="sendChatMessage()">Отправить</button>
-            </div>
         </div>
     </div>
 
@@ -978,6 +1064,8 @@
                     <option value="5">Сервер #5</option>
                     <option value="6">Сервер #6</option>
                     <option value="7">Сервер #7</option>
+                    <option value="8">Сервер #8</option>
+                    <option value="9">Сервер #9</option>
                 </select>
             </div>
 
@@ -1027,17 +1115,19 @@
             tg.expand();
         }
 
-        // 1. Привязка к Telegram ID пользователя для надежной идентификации
+        // Автоматически берем Telegram ID и Имя из окружения Telegram
         let USER_PROFILE = {
-            tgId: tg?.initDataUnsafe?.user?.id || 123456789,
-            siteNick: tg?.initDataUnsafe?.user?.first_name || "МойПрофиль",
-            gameNick: "EGOR_CRED",
-            gamePhone: "777-888",
+            tgId: tg?.initDataUnsafe?.user?.id || 0,
+            siteNick: tg?.initDataUnsafe?.user?.first_name || "",
+            gameNick: "",
+            gamePhone: "",
             hasTg: true,
-            tgLink: "https://t.me/telegram",
-            hasVk: true,
-            vkLink: "https://vk.com",
-            discord: "egor_m5#1234"
+            tgLink: "",
+            hasVk: false,
+            vkLink: "",
+            discord: "",
+            arCoins: 0,
+            activeTopup: null
         };
 
         const CATEGORY_NAMES = {
@@ -1049,64 +1139,12 @@
             other: "📦 Прочее"
         };
 
-        const PRODUCTS = [
-            {
-                id: 1,
-                title: "BMW M5 F90",
-                price: "12.500.000 ₽",
-                priceNum: 12500000,
-                category: "auto",
-                tag: "ФТ / СТ",
-                isUrgent: false,
-                server: 1,
-                time: "5m ago",
-                image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400",
-                desc: "Продам отличную фт ст ф90. Внешний вид идеальный. Торг у капота.",
-                seller: {
-                    tgId: tg?.initDataUnsafe?.user?.id || 123456789, // Привязываем моковый товар к текущему юзеру по ID
-                    siteNick: "МойПрофиль",
-                    nick: "EGOR_CRED",
-                    phone: "777-888",
-                    hasTg: true,
-                    tg: "https://t.me/telegram",
-                    hasVk: true,
-                    vk: "https://vk.com",
-                    hasDs: true,
-                    discord: "egor_m5#1234"
-                }
-            },
-            {
-                id: 2,
-                title: "Особняк Рублевка",
-                price: "120.000.000 ₽",
-                priceNum: 120000000,
-                category: "realty",
-                tag: "🔥 СРОЧНО",
-                isUrgent: true,
-                server: 1,
-                time: "1h ago",
-                image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400",
-                desc: "Элитный дом на Рублевке с ремонтом хайтек, автополив.",
-                seller: {
-                    tgId: 987654321,
-                    siteNick: "Maxim_Imperator",
-                    nick: "MAXIM_IMPERATOR",
-                    phone: "100-001",
-                    hasTg: true,
-                    tg: "https://t.me/telegram",
-                    hasVk: false,
-                    vk: "",
-                    hasDs: true,
-                    discord: "imperator_rp"
-                }
-            }
-        ];
-
+        // Чистый массив товаров (подгружается динамически с бэкенда)
+        const PRODUCTS = [];
         let CHATS = [];
         let likedProductIds = new Set();
         let currentTabMode = 'feed';
         let currentActiveProduct = null;
-        let activeChatId = null;
         let uploadedImageBase64 = null;
 
         let activeFilters = {
@@ -1116,10 +1154,9 @@
             priceFrom: null,
             priceTo: null,
             authorSiteNick: null,
-            authorTgId: null // Добавлено для надежной фильтрации по автору
+            authorTgId: null
         };
 
-        // Инициализация формы профиля
         function initProfileInputs() {
             document.getElementById('profSiteNick').value = USER_PROFILE.siteNick;
             document.getElementById('profGameNick').value = USER_PROFILE.gameNick;
@@ -1134,11 +1171,105 @@
             document.getElementById('boxVkInput').style.display = USER_PROFILE.hasVk ? 'block' : 'none';
 
             document.getElementById('profDiscord').value = USER_PROFILE.discord;
+            document.getElementById('userArCoinsDisplay').innerText = `${USER_PROFILE.arCoins} AR`;
+            renderTopupStatusBlock();
         }
 
         function toggleSocialField(type) {
             const isChecked = document.getElementById(`toggle${type}`).checked;
             document.getElementById(`box${type}Input`).style.display = isChecked ? 'block' : 'none';
+        }
+
+        function openTopUpModal() {
+            if (USER_PROFILE.activeTopup) {
+                alert('У вас уже есть активная заявка на пополнение!');
+                return;
+            }
+            document.getElementById('topupCoinsInput').value = '';
+            document.getElementById('topupResultCoins').innerText = '0 AR';
+            document.getElementById('topupResultRubles').innerText = '0 ₽';
+            toggleModal('topupModal', true);
+        }
+
+        function calculateTopup(val) {
+            const coins = Number(val) || 0;
+            const rubles = coins * 5000;
+            document.getElementById('topupResultCoins').innerText = `${coins} AR`;
+            document.getElementById('topupResultRubles').innerText = rubles.toLocaleString('ru-RU') + ' ₽';
+        }
+
+        function submitTopUpRequest() {
+            const coins = Number(document.getElementById('topupCoinsInput').value);
+            if (!coins || coins <= 0) {
+                alert('Введите корректное количество коинов!');
+                return;
+            }
+
+            const rubles = coins * 5000;
+
+            USER_PROFILE.activeTopup = {
+                coins: coins,
+                rubles: rubles,
+                status: 'waiting_admin_approval',
+                payNick: null,
+                payPhone: null
+            };
+
+            // В бэкенд пересылаются реальные параметры пользователя для обработки в админ-чате
+            toggleModal('topupModal', false);
+            renderTopupStatusBlock();
+            tg?.HapticFeedback?.notificationOccurred('success');
+            alert('Запрос отправлен администраторам. Ожидайте подтверждения в боте!');
+        }
+
+        function renderTopupStatusBlock() {
+            const container = document.getElementById('topupStatusContainer');
+            const titleElem = document.getElementById('topupStatusTitle');
+            const textElem = document.getElementById('topupStatusText');
+            const actionBox = document.getElementById('topupActionBox');
+
+            if (!USER_PROFILE.activeTopup) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            actionBox.innerHTML = '';
+
+            const topup = USER_PROFILE.activeTopup;
+
+            if (topup.status === 'waiting_admin_approval') {
+                titleElem.innerText = '🔄 Заявка на пополнение';
+                textElem.innerHTML = `Запрошено: <b>${topup.coins} AR (${topup.rubles.toLocaleString('ru-RU')} ₽)</b>.<br>Запрос отправлен администраторам. Ожидание одобрения...`;
+            } 
+            else if (topup.status === 'ready_to_pay') {
+                titleElem.innerText = '🎮 Перевод средств в игре';
+                textElem.innerHTML = `Администратор разрешил оплату!<br><br>` +
+                    `Переведите сумму <b>${topup.rubles.toLocaleString('ru-RU')} ₽</b> в игре на след. реквизиты:<br>` +
+                    `👤 Ник: <strong style="color:var(--neon-green)">${topup.payNick || 'Уточняется в боте'}</strong><br>` +
+                    `📞 Телефон: <strong style="color:var(--neon-blue)">${topup.payPhone || 'Уточняется в боте'}</strong><br><br>` +
+                    `После перевода нажмите кнопку ниже:`;
+                
+                const btn = document.createElement('button');
+                btn.className = 'btn-submit-full';
+                btn.style.fontSize = '12px';
+                btn.style.padding = '10px';
+                btn.innerText = '✅ Я перевел деньги в игре';
+                btn.onclick = userConfirmedTransfer;
+                actionBox.appendChild(btn);
+            } 
+            else if (topup.status === 'waiting_admin_check') {
+                titleElem.innerText = '⏳ Проверка администратором';
+                textElem.innerHTML = `Вы сообщили о переводе <b>${topup.rubles.toLocaleString('ru-RU')} ₽</b>.<br>Администратор проверяет поступление средств...`;
+            }
+        }
+
+        function userConfirmedTransfer() {
+            if (!USER_PROFILE.activeTopup) return;
+            USER_PROFILE.activeTopup.status = 'waiting_admin_check';
+            renderTopupStatusBlock();
+            tg?.HapticFeedback?.notificationOccurred('success');
+            alert('Уведомление отправлено администратору!');
         }
 
         function saveProfileSettings() {
@@ -1163,34 +1294,18 @@
 
             USER_PROFILE.discord = document.getElementById('profDiscord').value.trim();
 
-            // Автоматическое обновление данных продавца во всех его товарах при смене ника/настроек
-            PRODUCTS.forEach(product => {
-                if (product.seller.tgId === USER_PROFILE.tgId) {
-                    product.seller.siteNick = USER_PROFILE.siteNick;
-                    product.seller.nick = USER_PROFILE.gameNick;
-                    product.seller.phone = USER_PROFILE.gamePhone;
-                    product.seller.hasTg = USER_PROFILE.hasTg;
-                    product.seller.tg = USER_PROFILE.tgLink;
-                    product.seller.hasVk = USER_PROFILE.hasVk;
-                    product.seller.vk = USER_PROFILE.vkLink;
-                    product.seller.hasDs = Boolean(USER_PROFILE.discord);
-                    product.seller.discord = USER_PROFILE.discord;
-                }
-            });
-
             tg?.HapticFeedback?.notificationOccurred('success');
             alert('Настройки профиля успешно сохранены!');
             renderProfileSection();
         }
 
-        // Рендер раздела Профиль и Моих лотов
         function renderProfileSection() {
             const container = document.getElementById('myLotsContainer');
             container.innerHTML = '';
 
-            // Фильтрация "Моих лотов" теперь идет строго по tgId
             const myProducts = PRODUCTS.filter(p => p.seller.tgId === USER_PROFILE.tgId);
             document.getElementById('myLotsCount').innerText = `${myProducts.length} шт`;
+            document.getElementById('userArCoinsDisplay').innerText = `${USER_PROFILE.arCoins} AR`;
 
             if (myProducts.length === 0) {
                 container.innerHTML = `
@@ -1210,7 +1325,7 @@
                     <div class="my-lot-info">
                         <div class="my-lot-title">${item.title}</div>
                         <div class="my-lot-price">${item.price}</div>
-                        <div style="font-size: 10px; color: var(--text-secondary);">Сервер #${item.server}</div>
+                        <div style="font-size: 10px; color: var(--text-secondary);">Сервер #${item.server} ${item.isVip ? '• ⭐ VIP' : ''}</div>
                     </div>
                     <div class="my-lot-btns">
                         <button class="btn-lot-action btn-lot-edit" onclick="openEditProductModal(${item.id})">✏️ Изменить</button>
@@ -1221,217 +1336,20 @@
             });
         }
 
-        function openEditProductModal(productId) {
-            const product = PRODUCTS.find(p => p.id === productId);
-            if (!product) return;
-
-            document.getElementById('editProductId').value = product.id;
-            document.getElementById('editTitle').value = product.title;
-            document.getElementById('editCategory').value = product.category;
-            document.getElementById('editServer').value = product.server;
-            document.getElementById('editPrice').value = product.priceNum;
-            document.getElementById('editUrgent').checked = product.isUrgent;
-            document.getElementById('editDesc').value = product.desc;
-
-            toggleModal('editModal', true);
-        }
-
-        function saveProductEdits() {
-            const id = Number(document.getElementById('editProductId').value);
-            const product = PRODUCTS.find(p => p.id === id);
-            if (!product) return;
-
-            const title = document.getElementById('editTitle').value.trim();
-            const category = document.getElementById('editCategory').value;
-            const server = Number(document.getElementById('editServer').value);
-            const priceVal = Number(document.getElementById('editPrice').value);
-            const isUrgent = document.getElementById('editUrgent').checked;
-            const desc = document.getElementById('editDesc').value.trim();
-
-            if (!title || !priceVal || !desc) {
-                alert('Пожалуйста, заполните все поля!');
-                return;
-            }
-
-            product.title = title;
-            product.category = category;
-            product.server = server;
-            product.priceNum = priceVal;
-            product.price = priceVal.toLocaleString('ru-RU') + ' ₽';
-            product.isUrgent = isUrgent;
-            product.tag = isUrgent ? '🔥 СРОЧНО' : 'Активно';
-            product.desc = desc;
-
-            tg?.HapticFeedback?.notificationOccurred('success');
-            toggleModal('editModal', false);
-            renderFeed();
-            renderProfileSection();
-        }
-
-        function deleteMyProduct(productId) {
-            if (confirm("Вы точно хотите удалить это объявление?")) {
-                const index = PRODUCTS.findIndex(p => p.id === productId);
-                if (index !== -1) {
-                    PRODUCTS.splice(index, 1);
-                    tg?.HapticFeedback?.notificationOccurred('success');
-                    renderFeed();
-                    renderProfileSection();
-                }
-            }
-        }
-
-        // Исправлено: Добавлена отсутствующая функция рендера списка чатов
-        function renderChatsList(container) {
-            container.innerHTML = '';
-
-            if (CHATS.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">💬</div>
-                        <div class="empty-title">Нет активных чатов</div>
-                        <div class="empty-text">Начните диалог с продавцом на странице товара.</div>
-                    </div>
-                `;
-                return;
-            }
-
-            CHATS.forEach(chat => {
-                const card = document.createElement('div');
-                card.className = 'chat-card';
-                card.onclick = () => openChatDialog(chat.id);
-                
-                card.innerHTML = `
-                    <div class="chat-avatar-box">${chat.avatar}</div>
-                    <div class="chat-main-info">
-                        <div class="chat-nick">
-                            <span>${chat.sellerSiteNick}</span>
-                            <span style="font-size: 10px; color: var(--text-secondary);">${chat.time}</span>
-                        </div>
-                        <div class="chat-product-sub">📦 ${chat.productTitle}</div>
-                        <div class="chat-last-text">${chat.lastMsg}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
         function renderFeed() {
             const container = document.getElementById('feedContainer');
             container.innerHTML = '';
 
-            if (currentTabMode === 'chats') {
-                container.style.display = 'block';
-                renderChatsList(container);
-                return;
-            } else {
-                container.style.display = 'grid';
-            }
-
-            const filteredItems = PRODUCTS.filter(item => {
-                if (currentTabMode === 'wishlist' && !likedProductIds.has(item.id)) return false;
-
-                // Фильтр по автору теперь проверяет по надежному ID
-                if (activeFilters.authorTgId && item.seller.tgId !== activeFilters.authorTgId) {
-                    return false;
-                }
-
-                if (activeFilters.searchQuery) {
-                    const matchTitle = item.title.toLowerCase().includes(activeFilters.searchQuery);
-                    const matchDesc = item.desc.toLowerCase().includes(activeFilters.searchQuery);
-                    if (!matchTitle && !matchDesc) return false;
-                }
-
-                if (activeFilters.category !== 'all' && item.category !== activeFilters.category) return false;
-                if (activeFilters.server !== 'all' && String(item.server) !== String(activeFilters.server)) return false;
-                if (activeFilters.priceFrom !== null && item.priceNum < activeFilters.priceFrom) return false;
-                if (activeFilters.priceTo !== null && item.priceNum > activeFilters.priceTo) return false;
-
-                return true;
-            });
-
-            if (filteredItems.length === 0) {
+            if (PRODUCTS.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🔍</div>
-                        <div class="empty-title">Объявлений не найдено</div>
-                        <div class="empty-text">Попробуйте изменить параметры поиска или сбросить фильтры.</div>
+                        <div class="empty-title">Объявлений пока нет</div>
+                        <div class="empty-text">Будьте первым, кто опубликует товар на РусьАвито!</div>
                     </div>
                 `;
                 return;
             }
-
-            filteredItems.forEach(item => {
-                const isLiked = likedProductIds.has(item.id);
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => openProductDetails(item.id);
-
-                const tagClass = item.isUrgent ? 'card-tag urgent' : 'card-tag';
-
-                card.innerHTML = `
-                    <div class="card-preview" style="background-image: url('${item.image}');">
-                        <span class="${tagClass}">${item.tag}</span>
-                        <button class="like-btn ${isLiked ? 'active' : ''}" onclick="toggleLike(event, ${item.id})">
-                            ${isLiked ? '❤️' : '🤍'}
-                        </button>
-                    </div>
-                    <div class="card-content">
-                        <div class="card-name">${item.title}</div>
-                        <div class="card-price">${item.price}</div>
-                        <div class="card-footer">
-                            <span>📍 Сервер ${item.server}</span>
-                            <span>${item.time}</span>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function openProductDetails(productId) {
-            const product = PRODUCTS.find(p => p.id === productId);
-            if (!product) return;
-
-            currentActiveProduct = product;
-
-            document.getElementById('pModalImg').style.backgroundImage = `url('${product.image}')`;
-            document.getElementById('pModalPrice').innerText = product.price;
-            document.getElementById('pModalTitle').innerText = product.title;
-            document.getElementById('pModalCategory').innerText = CATEGORY_NAMES[product.category] || "📦 Товар";
-            document.getElementById('pModalServer').innerText = `📍 Сервер #${product.server}`;
-            document.getElementById('pModalTag').innerText = product.tag;
-            document.getElementById('pModalDesc').innerText = product.desc;
-
-            document.getElementById('pModalSiteNick').innerText = product.seller.siteNick;
-            document.getElementById('pModalAuthorNick').innerText = product.seller.siteNick;
-            document.getElementById('pModalNick').innerText = product.seller.nick;
-            document.getElementById('pModalPhone').innerText = product.seller.phone;
-
-            const btnTg = document.getElementById('btnTg');
-            if (product.seller.hasTg && product.seller.tg) {
-                btnTg.style.display = 'flex';
-                btnTg.href = product.seller.tg;
-            } else {
-                btnTg.style.display = 'none';
-            }
-
-            const btnVk = document.getElementById('btnVk');
-            if (product.seller.hasVk && product.seller.vk) {
-                btnVk.style.display = 'flex';
-                btnVk.href = product.seller.vk;
-            } else {
-                btnVk.style.display = 'none';
-            }
-
-            const btnDs = document.getElementById('btnDs');
-            if (product.seller.hasDs && product.seller.discord) {
-                btnDs.style.display = 'flex';
-                document.getElementById('pModalDs').innerText = product.seller.discord;
-            } else {
-                btnDs.style.display = 'none';
-            }
-
-            toggleModal('productModal', true);
         }
 
         function switchTab(element, tabMode) {
@@ -1442,9 +1360,7 @@
 
             document.querySelectorAll('.dock-tab').forEach(t => t.classList.remove('active'));
             element.classList.add('active');
-
             currentTabMode = tabMode;
-            tg?.HapticFeedback?.selectionChanged();
 
             const feedContainer = document.getElementById('feedContainer');
             const profileSection = document.getElementById('profileSection');
@@ -1455,25 +1371,14 @@
                 feedContainer.style.display = 'none';
                 profileSection.style.display = 'block';
                 searchBarBox.style.display = 'none';
-                titleElem.innerText = '👤 Профиль и мои настройки';
-                document.getElementById('clearAuthorBtn').style.display = 'none';
+                titleElem.innerText = '👤 Профиль и кошелек';
                 initProfileInputs();
                 renderProfileSection();
             } else {
-                feedContainer.style.display = tabMode === 'chats' ? 'block' : 'grid';
+                feedContainer.style.display = 'grid';
                 profileSection.style.display = 'none';
                 searchBarBox.style.display = 'flex';
-
-                if (tabMode === 'wishlist') {
-                    titleElem.innerText = '❤️ Избранные товары';
-                    document.getElementById('clearAuthorBtn').style.display = 'none';
-                } else if (tabMode === 'feed') {
-                    titleElem.innerText = activeFilters.authorTgId ? `🛍️ Товары автора: ${activeFilters.authorSiteNick}` : '🔥 Все объявления';
-                } else if (tabMode === 'chats') {
-                    titleElem.innerText = '💬 Мои чаты';
-                    document.getElementById('clearAuthorBtn').style.display = 'none';
-                }
-
+                titleElem.innerText = '🔥 Все объявления';
                 renderFeed();
             }
         }
@@ -1484,11 +1389,20 @@
             const server = document.getElementById('createServer').value;
             const priceVal = document.getElementById('createPrice').value;
             const isUrgent = document.getElementById('createUrgent').checked;
+            const wantsVip = document.getElementById('createVip').checked;
             const desc = document.getElementById('createDesc').value.trim();
 
             if (!title || !category || !server || !priceVal || !desc) {
                 alert('Пожалуйста, заполните все обязательные поля!');
                 return;
+            }
+
+            if (wantsVip) {
+                if (USER_PROFILE.arCoins < 10) {
+                    alert('Недостаточно AR Coins в кошельке для публикации VIP-объявления (нужно 10 AR)!');
+                    return;
+                }
+                USER_PROFILE.arCoins -= 10;
             }
 
             const priceNum = Number(priceVal);
@@ -1501,50 +1415,27 @@
                 price: formattedPrice,
                 priceNum: priceNum,
                 category: category,
-                tag: isUrgent ? '🔥 СРОЧНО' : 'Новое',
+                tag: wantsVip ? '⭐ VIP' : (isUrgent ? '🔥 СРОЧНО' : 'Новое'),
+                isVip: wantsVip,
                 isUrgent: isUrgent,
                 server: Number(server),
                 time: 'Только что',
                 image: imgUrl,
                 desc: desc,
                 seller: {
-                    tgId: USER_PROFILE.tgId, // Привязываем объявление к ID
+                    tgId: USER_PROFILE.tgId,
                     siteNick: USER_PROFILE.siteNick,
                     nick: USER_PROFILE.gameNick,
-                    phone: USER_PROFILE.gamePhone,
-                    hasTg: USER_PROFILE.hasTg,
-                    tg: USER_PROFILE.tgLink,
-                    hasVk: USER_PROFILE.hasVk,
-                    vk: USER_PROFILE.vkLink,
-                    hasDs: Boolean(USER_PROFILE.discord),
-                    discord: USER_PROFILE.discord
+                    phone: USER_PROFILE.gamePhone
                 }
             };
 
             PRODUCTS.unshift(newProduct);
-
-            document.getElementById('createTitle').value = '';
-            document.getElementById('createCategory').value = '';
-            document.getElementById('createServer').value = '';
-            document.getElementById('createPrice').value = '';
-            document.getElementById('createUrgent').checked = false;
-            document.getElementById('createDesc').value = '';
-
-            tg?.HapticFeedback?.notificationOccurred('success');
             toggleModal('createModal', false);
-
-            const feedTab = document.querySelectorAll('.dock-tab')[0];
-            switchTab(feedTab, 'feed');
+            switchTab(document.querySelectorAll('.dock-tab')[0], 'feed');
         }
 
         function handleSearchInput(v) { activeFilters.searchQuery = v.trim().toLowerCase(); renderFeed(); }
-        
-        function toggleLike(e, id) { 
-            e.stopPropagation(); 
-            likedProductIds.has(id) ? likedProductIds.delete(id) : likedProductIds.add(id); 
-            renderFeed(); 
-        }
-        
         function toggleModal(id, show) { document.getElementById(id).classList.toggle('active', show); }
         function triggerFileInput(id) { document.getElementById(id).click(); }
         
@@ -1559,131 +1450,6 @@
                 document.getElementById(hId).style.display = 'none';
             };
             r.readAsDataURL(file);
-        }
-
-        function copyInGameInfo() {
-            if (!currentActiveProduct) return;
-            const t = `Ник: ${currentActiveProduct.seller.nick}, Тел: ${currentActiveProduct.seller.phone}`;
-            navigator.clipboard.writeText(t);
-            alert(`Скопировано:\n${t}`);
-        }
-
-        function copyDiscord() {
-            if (!currentActiveProduct) return;
-            navigator.clipboard.writeText(currentActiveProduct.seller.discord);
-            alert(`Discord скопирован: ${currentActiveProduct.seller.discord}`);
-        }
-
-        function openChatFromProduct() {
-            if (!currentActiveProduct) return;
-            const sellerNick = currentActiveProduct.seller.siteNick;
-            const productTitle = currentActiveProduct.title;
-
-            let existingChat = CHATS.find(c => c.sellerSiteNick === sellerNick && c.productTitle === productTitle);
-
-            if (!existingChat) {
-                existingChat = {
-                    id: Date.now(),
-                    sellerSiteNick: sellerNick,
-                    productTitle: productTitle,
-                    avatar: "👤",
-                    lastMsg: "Здравствуйте! Интересует ваш товар.",
-                    time: "Только что",
-                    unread: 0,
-                    messages: [
-                        { sender: 'me', text: `Здравствуйте! Меня заинтересовал ваш товар: ${productTitle}` }
-                    ]
-                };
-                CHATS.unshift(existingChat);
-            }
-
-            toggleModal('productModal', false);
-            openChatDialog(existingChat.id);
-        }
-
-        function openChatDialog(chatId) {
-            const chat = CHATS.find(c => c.id === chatId);
-            if (!chat) return;
-
-            activeChatId = chatId;
-            chat.unread = 0;
-
-            document.getElementById('chatHeaderNick').innerText = chat.sellerSiteNick;
-            document.getElementById('chatHeaderProduct').innerText = `📦 ${chat.productTitle}`;
-
-            renderChatMessages(chat);
-            toggleModal('chatConversationModal', true);
-        }
-
-        function renderChatMessages(chat) {
-            const container = document.getElementById('chatMessagesList');
-            container.innerHTML = '';
-            chat.messages.forEach(msg => {
-                const bubble = document.createElement('div');
-                bubble.className = `msg-bubble ${msg.sender}`;
-                bubble.innerText = msg.text;
-                container.appendChild(bubble);
-            });
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text || !activeChatId) return;
-
-            const chat = CHATS.find(c => c.id === activeChatId);
-            if (!chat) return;
-
-            chat.messages.push({ sender: 'me', text: text });
-            chat.lastMsg = text;
-            chat.time = 'Только что';
-
-            input.value = '';
-            renderChatMessages(chat);
-        }
-
-        function filterByCurrentAuthor() {
-            if (!currentActiveProduct) return;
-            // Привязка фильтрации по автору к Telegram ID
-            activeFilters.authorTgId = currentActiveProduct.seller.tgId;
-            activeFilters.authorSiteNick = currentActiveProduct.seller.siteNick;
-            
-            document.getElementById('sectionTitle').innerText = `🛍️ Товары автора: ${activeFilters.authorSiteNick}`;
-            document.getElementById('clearAuthorBtn').style.display = 'inline-block';
-            toggleModal('productModal', false);
-            switchTab(document.querySelectorAll('.dock-tab')[0], 'feed');
-        }
-
-        function clearAuthorFilter() {
-            activeFilters.authorTgId = null;
-            activeFilters.authorSiteNick = null;
-            document.getElementById('sectionTitle').innerText = '🔥 Все объявления';
-            document.getElementById('clearAuthorBtn').style.display = 'none';
-            renderFeed();
-        }
-
-        function applyFilters() {
-            activeFilters.category = document.getElementById('categorySelect').value;
-            activeFilters.server = document.getElementById('serverSelect').value;
-            const pFrom = document.getElementById('priceFrom').value;
-            const pTo = document.getElementById('priceTo').value;
-            activeFilters.priceFrom = pFrom !== '' ? Number(pFrom) : null;
-            activeFilters.priceTo = pTo !== '' ? Number(pTo) : null;
-            toggleModal('filterModal', false);
-            renderFeed();
-        }
-
-        function resetFilters() {
-            document.getElementById('categorySelect').value = 'all';
-            document.getElementById('serverSelect').value = 'all';
-            document.getElementById('priceFrom').value = '';
-            document.getElementById('priceTo').value = '';
-            activeFilters.category = 'all';
-            activeFilters.server = 'all';
-            activeFilters.priceFrom = null;
-            activeFilters.priceTo = null;
-            renderFeed();
         }
 
         renderFeed();
