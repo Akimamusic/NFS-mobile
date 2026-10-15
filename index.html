@@ -37,7 +37,6 @@
             min-height: 100vh;
         }
 
-        /* Прелоадер в стиле маркетплейсов */
         #pagePreloader {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: #0f0c20; z-index: 9999;
@@ -250,7 +249,6 @@
         .btn-apply { width: 65%; background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple)); border: none; color: #fff; padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; }
         .btn-submit-full { width: 100%; background: linear-gradient(135deg, var(--neon-green), #00b09b); border: none; color: #000; padding: 16px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,136,0.3); }
 
-        /* Детали товара */
         .product-modal-image { width: 100%; height: 200px; border-radius: 20px; background-size: cover; background-position: center; margin-bottom: 16px; }
         .product-details-price { font-size: 24px; font-weight: 900; color: var(--neon-green); margin-bottom: 6px; }
         .product-details-title { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
@@ -271,7 +269,6 @@
         .btn-ds { background: var(--ds-purple); grid-column: span 2; }
         .btn-author-goods { width: 100%; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--glass-border); color: #fff; font-size: 13px; font-weight: 700; padding: 12px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        /* ЧАТЫ */
         .chat-card { background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 10px; }
         .chat-avatar-box { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue)); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
         .chat-main-info { flex-grow: 1; overflow: hidden; }
@@ -284,7 +281,6 @@
         .msg-bubble.me { background: linear-gradient(135deg, var(--neon-blue), #00b09b); color: #000; font-weight: 700; align-self: flex-end; }
         .chat-input-bar { display: flex; gap: 8px; margin-top: 14px; }
 
-        /* Нижняя навигация с новыми премиум иконками */
         .bottom-dock {
             position: fixed; bottom: 15px; left: 18px; right: 18px;
             background: rgba(20, 16, 42, 0.88); backdrop-filter: blur(20px);
@@ -301,7 +297,6 @@
 </head>
 <body>
 
-    <!-- Тематический прелоадер -->
     <div id="pagePreloader">
         <div class="market-loader-spinner"></div>
         <div class="market-loader-title">РусьАвито</div>
@@ -327,7 +322,6 @@
 
     <div class="market-feed" id="feedContainer"></div>
 
-    <!-- РАЗДЕЛ ПРОФИЛЬ -->
     <div class="profile-wrapper" id="profileSection">
         <div class="profile-card">
             <div class="profile-card-title">⚙️ Настройки профиля</div>
@@ -344,7 +338,6 @@
                 <input type="text" id="profGamePhone" class="text-input" placeholder="777-888">
             </div>
 
-            <!-- СОЦСЕТИ И КНОПКИ ОТКЛЮЧЕНИЯ -->
             <div class="filter-group">
                 <div class="social-toggle-row">
                     <span class="social-toggle-label">✈️ Telegram</span>
@@ -396,7 +389,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО: Создание объявления -->
     <div class="modal-overlay" id="createModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -472,7 +464,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно просмотра товара -->
     <div class="modal-overlay" id="productModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -520,7 +511,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно чата -->
     <div class="modal-overlay" id="chatConversationModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -540,7 +530,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ФИЛЬТРОВ -->
     <div class="modal-overlay" id="filterModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -592,7 +581,6 @@
         </div>
     </div>
 
-    <!-- НИЖНЯЯ НАВИГАЦИЯ С КРАСИВЫМИ SVG ИКОНКАМИ -->
     <div class="bottom-dock">
         <a href="#" class="dock-tab active" onclick="switchTab(this, 'feed')">
             <svg viewBox="0 0 24 24"><path d="M12 23c-4.97 0-9-3.58-9-8.02 0-3.14 1.87-6.02 4.79-7.31l1.11-.5-.22-1.22c-.37-2.02.57-3.95 2.3-4.95 1.76-1.03 3.99-.78 5.51.62l.85.78-.63 1.05c-.9 1.5-.78 3.39.29 4.76l.73.94-1.02.66C15.26 12.01 14 13.9 14 15.98c0 3.31 2.69 6.02 6 6.02h-8z"/></svg>
@@ -620,8 +608,9 @@
         const tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); }
 
-        const defaultTgId = tg?.initDataUnsafe?.user?.id || 123456789;
-        const defaultName = tg?.initDataUnsafe?.user?.first_name || "Игрок";
+        const tgUser = tg?.initDataUnsafe?.user;
+        const defaultTgId = String(tgUser?.id || 123456789);
+        const defaultName = tgUser?.first_name || tgUser?.username || "Пользователь";
 
         let USER_PROFILE = JSON.parse(localStorage.getItem(`rus_avito_user_${defaultTgId}`)) || {
             tgId: defaultTgId,
@@ -635,6 +624,11 @@
             hasDs: false,
             discord: ""
         };
+
+        if (USER_PROFILE.siteNick === "Игрок" && defaultName !== "Пользователь") {
+            USER_PROFILE.siteNick = defaultName;
+            localStorage.setItem(`rus_avito_user_${defaultTgId}`, JSON.stringify(USER_PROFILE));
+        }
 
         const CATEGORY_NAMES = {
             auto: "🏎️ Авторынок",
@@ -668,7 +662,9 @@
                 const pRes = await fetch(`/api/profile/${USER_PROFILE.tgId}?defaultName=${encodeURIComponent(USER_PROFILE.siteNick)}`);
                 if (pRes.ok) {
                     const pData = await pRes.json();
-                    if (pData.siteNick) USER_PROFILE.siteNick = pData.siteNick;
+                    if (pData.siteNick && pData.siteNick !== "Игрок") {
+                        USER_PROFILE.siteNick = pData.siteNick;
+                    }
                     if (pData.gameNick) USER_PROFILE.gameNick = pData.gameNick;
                     if (pData.gamePhone) USER_PROFILE.gamePhone = pData.gamePhone;
                     if (pData.tgLink) USER_PROFILE.tgLink = pData.tgLink;
@@ -687,7 +683,6 @@
             initProfileInputs();
             renderFeed();
 
-            // Плавное скрытие прелоадера
             const preloader = document.getElementById('pagePreloader');
             if (preloader) {
                 preloader.style.opacity = '0';
@@ -764,7 +759,7 @@
             const container = document.getElementById('myLotsContainer');
             container.innerHTML = '';
 
-            const myProducts = PRODUCTS.filter(p => Number(p.seller?.tgId) === Number(USER_PROFILE.tgId));
+            const myProducts = PRODUCTS.filter(p => String(p.seller?.tgId) === String(USER_PROFILE.tgId));
             document.getElementById('myLotsCount').innerText = `${myProducts.length} шт`;
 
             if (myProducts.length === 0) {
@@ -843,7 +838,7 @@
             const filtered = PRODUCTS.filter(p => {
                 if (currentTabMode === 'wishlist' && !likedProductIds.has(p.id)) return false;
 
-                if (activeFilters.authorTgId && Number(p.seller?.tgId) !== Number(activeFilters.authorTgId)) return false;
+                if (activeFilters.authorTgId && String(p.seller?.tgId) !== String(activeFilters.authorTgId)) return false;
 
                 if (activeFilters.searchQuery) {
                     const matchTitle = p.title.toLowerCase().includes(activeFilters.searchQuery);
@@ -854,7 +849,7 @@
                 if (activeFilters.category !== 'all' && p.category !== activeFilters.category) return false;
                 if (activeFilters.server !== 'all' && String(p.server) !== String(activeFilters.server)) return false;
                 
-                const priceNum = parseInt(p.price.replace(/\D/g, '')) || 0;
+                const priceNum = parseInt(String(p.price).replace(/\D/g, '')) || 0;
                 if (activeFilters.priceFrom !== null && priceNum < activeFilters.priceFrom) return false;
                 if (activeFilters.priceTo !== null && priceNum > activeFilters.priceTo) return false;
 
@@ -944,7 +939,7 @@
             const desc = document.getElementById('createDesc').value.trim();
 
             if (!title || !category || !server || !priceVal || !desc) {
-                alert('Заполните все поля!');
+                alert('Заполните все обязательные поля!');
                 return;
             }
 
@@ -958,7 +953,7 @@
                 desc,
                 image: uploadedImageBase64 || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400',
                 seller: {
-                    tgId: USER_PROFILE.tgId,
+                    tgId: String(USER_PROFILE.tgId),
                     siteNick: USER_PROFILE.siteNick,
                     nick: USER_PROFILE.gameNick,
                     phone: USER_PROFILE.gamePhone,
@@ -971,23 +966,34 @@
                 }
             };
 
-            await fetch('/api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const res = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            toggleModal('createModal', false);
-            document.getElementById('createTitle').value = '';
-            document.getElementById('createPrice').value = '';
-            document.getElementById('createDesc').value = '';
-            document.getElementById('createUrgent').checked = false;
-            uploadedImageBase64 = null;
-            document.getElementById('photoPreview').style.display = 'none';
-            document.getElementById('uploadPlaceholder').style.display = 'block';
+                const data = await res.json();
 
-            alert('Объявление опубликовано!');
-            loadAppData();
+                if (res.ok && data.success) {
+                    toggleModal('createModal', false);
+                    document.getElementById('createTitle').value = '';
+                    document.getElementById('createPrice').value = '';
+                    document.getElementById('createDesc').value = '';
+                    document.getElementById('createUrgent').checked = false;
+                    uploadedImageBase64 = null;
+                    document.getElementById('photoPreview').style.display = 'none';
+                    document.getElementById('uploadPlaceholder').style.display = 'block';
+
+                    alert('Объявление успешно опубликовано!');
+                    loadAppData();
+                } else {
+                    alert('Ошибка сервера: ' + (data.error || 'Неизвестная ошибка'));
+                }
+            } catch (err) {
+                alert('Ошибка сети: не удалось отправить объявление.');
+                console.error(err);
+            }
         }
 
         function toggleLike(e, id) {
