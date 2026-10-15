@@ -269,18 +269,6 @@
         .btn-ds { background: var(--ds-purple); grid-column: span 2; }
         .btn-author-goods { width: 100%; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--glass-border); color: #fff; font-size: 13px; font-weight: 700; padding: 12px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        .chat-card { background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 10px; }
-        .chat-avatar-box { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue)); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-        .chat-main-info { flex-grow: 1; overflow: hidden; }
-        .chat-nick { font-size: 14px; font-weight: 800; color: #fff; display: flex; justify-content: space-between; }
-        .chat-product-sub { font-size: 11px; color: var(--neon-blue); font-weight: 600; margin: 2px 0 4px; }
-        .chat-last-text { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .chat-dialog-messages { display: flex; flex-direction: column; gap: 10px; max-height: 55vh; min-height: 250px; overflow-y: auto; padding: 10px 0; }
-        .msg-bubble { max-width: 82%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; word-break: break-word; }
-        .msg-bubble.them { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); align-self: flex-start; color: #fff; }
-        .msg-bubble.me { background: linear-gradient(135deg, var(--neon-blue), #00b09b); color: #000; font-weight: 700; align-self: flex-end; }
-        .chat-input-bar { display: flex; gap: 8px; margin-top: 14px; }
-
         .bottom-dock {
             position: fixed; bottom: 15px; left: 18px; right: 18px;
             background: rgba(20, 16, 42, 0.88); backdrop-filter: blur(20px);
@@ -460,7 +448,7 @@
                 <textarea id="createDesc" class="textarea-input" placeholder="Детали товара..."></textarea>
             </div>
 
-            <button class="btn-submit-full" onclick="submitNewProduct()">Опубликовать</button>
+            <button class="btn-submit-full" id="btnSubmitLot" onclick="submitNewProduct()">Опубликовать</button>
         </div>
     </div>
 
@@ -508,25 +496,6 @@
                 <span>🛍️</span>
                 <span>Все товары автора (<strong id="pModalAuthorNick">Игрок</strong>)</span>
             </button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="chatConversationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div>
-                    <div class="modal-title" id="chatHeaderNick">Имя Продавца</div>
-                    <div style="font-size: 11px; color: var(--neon-blue);" id="chatHeaderProduct">📦 Товар</div>
-                </div>
-                <button class="close-btn" onclick="toggleModal('chatConversationModal', false)">✕</button>
-            </div>
-
-            <div class="chat-dialog-messages" id="chatMessagesList"></div>
-
-            <div class="chat-input-bar">
-                <input type="text" id="chatInput" class="text-input" placeholder="Напишите сообщение..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <button class="btn-apply" style="width: auto; padding: 0 18px;" onclick="sendChatMessage()">Отправить</button>
-            </div>
         </div>
     </div>
 
@@ -644,7 +613,6 @@
         let likedProductIds = new Set();
         let currentTabMode = 'feed';
         let currentActiveProduct = null;
-        let activeChatId = null;
         let uploadedImageBase64 = null;
 
         let activeFilters = {
@@ -792,48 +760,10 @@
             }
         }
 
-        function renderChatsList(container) {
-            container.innerHTML = '';
-            if (CHATS.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div style="font-size: 32px; margin-bottom: 8px;">💬</div>
-                        <div>Нет активных чатов</div>
-                    </div>
-                `;
-                return;
-            }
-
-            CHATS.forEach(chat => {
-                const card = document.createElement('div');
-                card.className = 'chat-card';
-                card.onclick = () => openChatDialog(chat.id);
-                card.innerHTML = `
-                    <div class="chat-avatar-box">${chat.avatar}</div>
-                    <div class="chat-main-info">
-                        <div class="chat-nick">
-                            <span>${chat.sellerSiteNick}</span>
-                            <span style="font-size: 10px; color: var(--text-secondary);">${chat.time}</span>
-                        </div>
-                        <div class="chat-product-sub">📦 ${chat.productTitle}</div>
-                        <div class="chat-last-text">${chat.lastMsg}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
         function renderFeed() {
             const container = document.getElementById('feedContainer');
             container.innerHTML = '';
-
-            if (currentTabMode === 'chats') {
-                container.style.display = 'block';
-                renderChatsList(container);
-                return;
-            } else {
-                container.style.display = 'grid';
-            }
+            container.style.display = 'grid';
 
             const filtered = PRODUCTS.filter(p => {
                 if (currentTabMode === 'wishlist' && !likedProductIds.has(p.id)) return false;
@@ -931,6 +861,7 @@
         }
 
         async function submitNewProduct() {
+            const btn = document.getElementById('btnSubmitLot');
             const title = document.getElementById('createTitle').value.trim();
             const category = document.getElementById('createCategory').value;
             const server = document.getElementById('createServer').value;
@@ -942,6 +873,9 @@
                 alert('Заполните все обязательные поля!');
                 return;
             }
+
+            btn.disabled = true;
+            btn.innerText = 'Публикация...';
 
             const payload = {
                 id: Date.now(),
@@ -955,8 +889,8 @@
                 seller: {
                     tgId: String(USER_PROFILE.tgId),
                     siteNick: USER_PROFILE.siteNick,
-                    nick: USER_PROFILE.gameNick,
-                    phone: USER_PROFILE.gamePhone,
+                    nick: USER_PROFILE.gameNick || USER_PROFILE.siteNick,
+                    phone: USER_PROFILE.gamePhone || '000-000',
                     hasTg: USER_PROFILE.hasTg,
                     tgLink: USER_PROFILE.tgLink,
                     hasVk: USER_PROFILE.hasVk,
@@ -988,11 +922,14 @@
                     alert('Объявление успешно опубликовано!');
                     loadAppData();
                 } else {
-                    alert('Ошибка сервера: ' + (data.error || 'Неизвестная ошибка'));
+                    alert('Ошибка сервера: ' + (data.error || 'Не удалось записать в базу'));
                 }
             } catch (err) {
-                alert('Ошибка сети: не удалось отправить объявление.');
+                alert('Сбой сети при отправке!');
                 console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Опубликовать';
             }
         }
 
@@ -1002,7 +939,7 @@
             renderFeed();
         }
 
-        function handleSearchInput(v) { searchQuery = v.trim().toLowerCase(); renderFeed(); }
+        function handleSearchInput(v) { activeFilters.searchQuery = v.trim().toLowerCase(); renderFeed(); }
 
         function switchTab(element, tabMode) {
             if (tabMode === 'create') { toggleModal('createModal', true); return; }
@@ -1022,82 +959,15 @@
                 initProfileInputs();
                 renderProfileSection();
             } else {
-                document.getElementById('feedContainer').style.display = tabMode === 'chats' ? 'block' : 'grid';
+                document.getElementById('feedContainer').style.display = 'grid';
                 document.getElementById('profileSection').style.display = 'none';
                 searchBar.style.display = 'flex';
 
                 if (tabMode === 'wishlist') titleElem.innerText = '❤️ Избранное';
-                else if (tabMode === 'chats') titleElem.innerText = '💬 Чаты';
                 else titleElem.innerText = '🔥 Все объявления';
 
                 renderFeed();
             }
-        }
-
-        function openChatFromProduct() {
-            if (!currentActiveProduct) return;
-            const sellerNick = currentActiveProduct.seller?.siteNick || 'Игрок';
-            const productTitle = currentActiveProduct.title;
-
-            let existingChat = CHATS.find(c => c.sellerSiteNick === sellerNick && c.productTitle === productTitle);
-
-            if (!existingChat) {
-                existingChat = {
-                    id: Date.now(),
-                    sellerSiteNick: sellerNick,
-                    productTitle: productTitle,
-                    avatar: "👤",
-                    lastMsg: "Здравствуйте! Интересует ваш товар.",
-                    time: "Только что",
-                    messages: [
-                        { sender: 'me', text: `Здравствуйте! Интересует ваш товар: ${productTitle}` }
-                    ]
-                };
-                CHATS.unshift(existingChat);
-            }
-
-            toggleModal('productModal', false);
-            openChatDialog(existingChat.id);
-        }
-
-        function openChatDialog(chatId) {
-            const chat = CHATS.find(c => c.id === chatId);
-            if (!chat) return;
-
-            activeChatId = chatId;
-            document.getElementById('chatHeaderNick').innerText = chat.sellerSiteNick;
-            document.getElementById('chatHeaderProduct').innerText = `📦 ${chat.productTitle}`;
-
-            renderChatMessages(chat);
-            toggleModal('chatConversationModal', true);
-        }
-
-        function renderChatMessages(chat) {
-            const container = document.getElementById('chatMessagesList');
-            container.innerHTML = '';
-            chat.messages.forEach(msg => {
-                const bubble = document.createElement('div');
-                bubble.className = `msg-bubble ${msg.sender}`;
-                bubble.innerText = msg.text;
-                container.appendChild(bubble);
-            });
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text || !activeChatId) return;
-
-            const chat = CHATS.find(c => c.id === activeChatId);
-            if (!chat) return;
-
-            chat.messages.push({ sender: 'me', text: text });
-            chat.lastMsg = text;
-            chat.time = 'Только что';
-
-            input.value = '';
-            renderChatMessages(chat);
         }
 
         function filterByCurrentAuthor() {
@@ -1158,17 +1028,48 @@
         function toggleModal(id, show) { document.getElementById(id).classList.toggle('active', show); }
         function triggerFileInput(id) { document.getElementById(id).click(); }
 
+        // АВТОМАТИЧЕСКОЕ СЖАТИЕ ФОТО ДЛЯ ИЗБЕЖАНИЯ ОШИБКИ СЕТИ
         function handleImageSelect(e, pId, hId) {
             const file = e.target.files[0];
             if (!file) return;
-            const r = new FileReader();
-            r.onload = function(ev) {
-                uploadedImageBase64 = ev.target.result;
-                document.getElementById(pId).style.backgroundImage = `url('${uploadedImageBase64}')`;
-                document.getElementById(pId).style.display = 'block';
-                document.getElementById(hId).style.display = 'none';
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Сжимаем до JPEG 0.7 качества (~100-150KB)
+                    uploadedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                    document.getElementById(pId).style.backgroundImage = `url('${uploadedImageBase64}')`;
+                    document.getElementById(pId).style.display = 'block';
+                    document.getElementById(hId).style.display = 'none';
+                };
+                img.src = ev.target.result;
             };
-            r.readAsDataURL(file);
+            reader.readAsDataURL(file);
         }
 
         loadAppData();
