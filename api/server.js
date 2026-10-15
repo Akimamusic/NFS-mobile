@@ -4,13 +4,11 @@ const { Redis } = require('@upstash/redis');
 
 const app = express();
 
-// Увеличиваем лимит размера JSON, чтобы картинки в формате Base64 успешно сохранялись без ошибок 413 Payload Too Large
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID; 
-const CHANNEL_ID = process.env.CHANNEL_ID;         
 const BOT_USERNAME = process.env.BOT_USERNAME;    
 
 const bot = new TelegramBot(TOKEN);
@@ -140,52 +138,34 @@ app.post('/api/products', async (req, res) => {
 
     const catName = categoryNames[product.category] || "Прочее";
 
-    // Отправка карточки лота в Админ-чат с кнопкой и ID для удаления
+    // Сначала сохраняем в базу данных
+    let products = await redis.get('products') || [];
+    products.unshift(product);
+    await redis.set('products', products);
+
+    // Отправка текстовой карточки лота в Админ-чат с кнопками
     if (ADMIN_CHAT_ID) {
       await bot.sendMessage(ADMIN_CHAT_ID, 
         `📢 <b>НОВОЕ ОБЪЯВЛЕНИЕ</b>\n\n` +
-        `🆔 <b>ID объявления:</b> <code>${product.id}</code>\n` +
+        `🆔 <b>ID:</b> <code>${product.id}</code>\n` +
         `🚗 <b>Название:</b> ${product.title}\n` +
         `💰 <b>Цена:</b> ${product.price}\n` +
         `📍 <b>Сервер:</b> #${product.server}\n` +
         `📌 <b>Категория:</b> ${catName}\n` +
         `👤 <b>Продавец:</b> ${product.seller.siteNick} (Игровой: <code>${product.seller.nick}</code>, Тел: <code>${product.seller.phone}</code>)\n\n` +
         `📝 <b>Описание:</b> ${product.desc || 'Нет'}\n\n` +
-        `⚠️ <i>Удалить лот: <code>/delete ${product.id}</code></i>`,
+        `⚠️ <i>Удалить: <code>/delete ${product.id}</code></i>`,
         {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '🔍 Открыть в приложении', url: `https://t.me/${BOT_USERNAME}/app?startapp=prod_${product.id}` }],
+              [{ text: '🔍 Посмотреть в приложении', url: `https://t.me/${BOT_USERNAME}/app?startapp=prod_${product.id}` }],
               [{ text: '🗑️ Удалить лот', callback_data: `delete_prod_${product.id}` }]
             ]
           }
         }
       );
     }
-
-    // Публикация в публичный канал
-    if (CHANNEL_ID) {
-      await bot.sendMessage(CHANNEL_ID, 
-        `🔥 <b>Новое объявление на РусьАвито!</b>\n\n` +
-        `🚗 <b>${product.title}</b>\n` +
-        `💰 Цена: <b>${product.price}</b>\n` +
-        `📍 Сервер: <b>#${product.server}</b>\n\n` +
-        (product.desc ? `📝 <i>${product.desc.substring(0, 80)}...</i>` : ''),
-        {
-          parse_mode: 'HTML',
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: '🔍 Посмотреть объявление', url: `https://t.me/${BOT_USERNAME}/app?startapp=prod_${product.id}` }]
-            ]
-          }
-        }
-      );
-    }
-
-    let products = await redis.get('products') || [];
-    products.unshift(product);
-    await redis.set('products', products);
 
     res.json({ success: true, productId: product.id });
   } catch (err) {
@@ -194,7 +174,6 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-// Удаление продукта через REST (если используется клиентом)
 app.delete('/api/products/:id', async (req, res) => {
   try {
     const productId = Number(req.params.id);
